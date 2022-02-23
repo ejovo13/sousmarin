@@ -46,7 +46,7 @@ r <- rf(32)
 
 library(MASS)
 
-plt.mv2 <- function(n) {
+plt.mv2 <- function(n = 1000) {
 
     dt <- gen_data2(n)
 
