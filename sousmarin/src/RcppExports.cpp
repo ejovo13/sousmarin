@@ -31,10 +31,20 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// test_threads
+void test_threads();
+RcppExport SEXP _sousmarin_test_threads() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test_threads();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sousmarin_double_me", (DL_FUNC) &_sousmarin_double_me, 1},
     {"_sousmarin_say_hello", (DL_FUNC) &_sousmarin_say_hello, 1},
+    {"_sousmarin_test_threads", (DL_FUNC) &_sousmarin_test_threads, 0},
     {NULL, NULL, 0}
 };
 

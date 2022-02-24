@@ -1,31 +1,9 @@
-#include <Rcpp.h>
+// #include <Rcpp.h>
 #include <cstdint>
-// #include <iostream>
+#include <iostream>
 #include <thread>
 #include <chrono>
 #include <utility>
-
-using namespace Rcpp;
-
-//asdfs [[Rcpp::export]]
-typedef struct xoshiro256ss_state {
-	uint64_t s[4];
-} xor_rng;
-
-//' Multiply a number by two
-//'
-//'
-//' @export
-//[[Rcpp::export]]
-int double_me(int x) {
-    return 2 * x;
-}
-
-//' @export
-//[[Rcpp::export]]
-void say_hello(int x) {
-    Rcout << "You entered: " << x << std::endl;
-}
 
 void f1(int n)
 {
@@ -55,14 +33,11 @@ void test_threads() {
     std::thread t1(f1, n + 1);
     t1.join();
 
-}
-
-void test_omp() {
-
-    int count = 0;
-
-
-
 
 }
 
+int main() {
+
+    test_threads();
+
+}
