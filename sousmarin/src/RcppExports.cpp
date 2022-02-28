@@ -10,6 +10,38 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// set_seed
+void set_seed(uint32_t seed);
+RcppExport SEXP _sousmarin_set_seed(SEXP seedSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< uint32_t >::type seed(seedSEXP);
+    set_seed(seed);
+    return R_NilValue;
+END_RCPP
+}
+// print_xor_state
+void print_xor_state();
+RcppExport SEXP _sousmarin_print_xor_state() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    print_xor_state();
+    return R_NilValue;
+END_RCPP
+}
+// xorunif
+NumericVector xorunif(int n, double min, double max);
+RcppExport SEXP _sousmarin_xorunif(SEXP nSEXP, SEXP minSEXP, SEXP maxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type min(minSEXP);
+    Rcpp::traits::input_parameter< double >::type max(maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(xorunif(n, min, max));
+    return rcpp_result_gen;
+END_RCPP
+}
 // double_me
 int double_me(int x);
 RcppExport SEXP _sousmarin_double_me(SEXP xSEXP) {
@@ -42,6 +74,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_sousmarin_set_seed", (DL_FUNC) &_sousmarin_set_seed, 1},
+    {"_sousmarin_print_xor_state", (DL_FUNC) &_sousmarin_print_xor_state, 0},
+    {"_sousmarin_xorunif", (DL_FUNC) &_sousmarin_xorunif, 3},
     {"_sousmarin_double_me", (DL_FUNC) &_sousmarin_double_me, 1},
     {"_sousmarin_say_hello", (DL_FUNC) &_sousmarin_say_hello, 1},
     {"_sousmarin_test_threads", (DL_FUNC) &_sousmarin_test_threads, 0},
