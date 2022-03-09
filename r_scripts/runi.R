@@ -6,5 +6,3 @@ runi = function(xo,n){
   }
   x/(2**16 + 1)
 }
-
-# ca cest un changement
