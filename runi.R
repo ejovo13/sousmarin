@@ -5,4 +5,6 @@ runi = function(xo,n){
     x[i+1] = (75*x[i] + 74) %% (2**16 + 1)
   }
   x/(2**16 + 1)
-}   
+}
+
+# ca cest un changement
