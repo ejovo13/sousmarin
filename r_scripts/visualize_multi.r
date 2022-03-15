@@ -5,6 +5,7 @@
 library(sousmarin)
 library(testit)
 library(tidyverse)
+# library(misc3d)
 
 n <- 100000
 m <- 3
@@ -36,6 +37,16 @@ gen_data2 <- function(n) {
 
 }
 
+gen_data3 <- function(n) {
+
+    dt <- rgoenorm(n, 3)
+
+    Sigma <- dt$sigma
+    A <- dt$matrix
+
+    tibble(x = A[,1], y = A[,2], z = A[,3])
+}
+
 ## Ok now let's try and visualize this with a 2d hexagonal plot
 # library(hexbin)
 library(RColorBrewer)
@@ -52,10 +63,21 @@ plt.mv2 <- function(n = 1000) {
 
     # k <- kde2d(dt$x, dt$y)
     k <- kde2d(dt$x, dt$y, n=1000)
-    image(k, col = r)
+    # image(k, col = r)
+    image(k, col = hcl.colors(12, "Blues", rev = TRUE), xaxt = "n", yaxt = "n", bty = "n")
 
     k
 }
+
+# plt.mv3 <- function(n = 100) {
+
+#     dt <- gen_data3(n)
+
+#     k <- kde3d(dt$x, dt$y, dt$z, n = 100)
+
+#     image(k)
+
+# }
 
 library(tikzDevice)
 
