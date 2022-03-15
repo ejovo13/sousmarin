@@ -1,6 +1,10 @@
 *
-!media
+
+!media/
 !old/
+!plots/
+
 !**.tex
+!**.png
 !.gitignore
 # !**.pdf
