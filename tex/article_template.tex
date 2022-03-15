@@ -1,0 +1,202 @@
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[10pt]{article} % use larger type; default would be 10pt
+
+\input{preamble.tex}
+
+\title{Cables Sous-Marins}
+\author{NEEL Pauline, PETROS Samson, RAKOTOVAO Jonathan, VOYLES Evan}
+\date{15 Mars 2022}
+
+
+\begin{document}
+
+
+\begin{titlepage}
+
+\maketitle
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics{media/plot.png}
+\end{figure}
+
+\vspace{3cm}
+
+% \begin{figure}[h!]
+%     \centering
+%     \includegraphics[width=0.25\linewidth]{media/1280px-Logo_Polytech_Sorbonne.png}
+% \end{figure}
+
+% \begin{abstract}
+% Abstract.
+% \end{abstract}
+
+% \renewcommand {\epigraphflush} {center}
+
+\epigraph{Any one who considers arithmetical methods of producing random digits is, of course, in a state of sin}
+ {\textit{John von Neumann}}
+
+\newpage
+
+\end{titlepage}
+
+\pagestyle{fancy}
+
+\section{Génération des variables aléatoires}
+
+Un ordinateur n'est qu'un gros agencement complexe des circuits. Regnés par les lois physiques, les opérations provenant du mouvement des electrons
+sont encodés par les fonctions booléennes. Les \textit{fonctions} - dans le sens mathémathique - sont des objets purement déterministes. Autrement dit,
+une fonction associe à une donné d'entrée une valeur unique apartenant à l'espace d'arrivé. Si on lui donne plusiers fois la même valeurs, par exemple $x_1$ et $x_2$
+tels que $x_1 = x_2$, la définition d'une fonction oblige que $f(x_1) = f(x_2)$. D'où vient l'énigme. Comment générer des variables aléatoires quand il reste à notre
+disposition que des méthodes déterministes?
+% \setlength \epigraphwidth {\linewidth}
+
+On n'ose pas à répondre à cette question plus éloquemment que celle-ci offert par John von Neumann, l'un des meilleurs mathémathiciens, pionniers, informaticiens de tous les temps; générer des variables aléatoires sur un ordinateur n'est tout simplement pas possible.
+Cependant, cela ne nous empechera pas d'essayer quand même.
+
+\section{Loi uniforme}
+
+On commence notre projet en étudiant la loi la plus simples parmi les lois usuelles - la loi uniforme. Non seulement parce qu'elle est simple, mais en plus à partir de cela, nous allons
+pour construire des algorithmes plus complexes (notamment la méthode de la transormée inverse; la méthode de rejet) permettant de simuler des
+lois differentes comme la loi normale, la loi exponentielle, etc. Il s'agira principalement d'échantilloner une variable $X\sim \mathcal{U}(0, 1)$ puis ensuite effectuer des manipulations
+mathématiques pour produire une variable suivant une autre loi ciblée.
+
+Alors sans plus tarder, on formalise nos objectives. Le principe est le suivant: nous allons générer une suite $(x_n$) à partir d'une graine $x_0$ et une fonction $f : \mathbb{R} \longrightarrow \mathbb{R}$ telle que
+$$
+\left\{
+    \begin{array}{ll}
+        x_{0} \in \mathbb{R} \\
+        x_{n} = f(x_{n - 1})  \quad \forall n \in \mathbb{N} \\
+    \end{array}
+\right.
+$$
+
+On souhaite trouvé une fonction vérifianté certaines qualités désirées. Par exemple, on veut que notre fonction ait une période suffisamment long et qu'elle
+produise des valeurs très variés. Etudions la fonction $x \mapsto (x + 1) \mathbin{\%} 2$, où \% est l'opération de modulus et on fixe une graine $x_0 = 1$.
+\begin{align*}
+    f(x_0) &= (1 + 1) \mathbin{\%} 2 = 2 \mathbin{\%} 2 = 0 \\
+    f(x_1) &= (0 + 1) \mathbin{\%} 2 = 1 \mathbin{\%} 2 = 1 \\
+    f(x_2) &= (1 + 1) = 0
+\end{align*}
+Cette fonction produit alors la suite
+\begin{equation*}
+    \{1, 0, 1, 0, 1, 0, 1, 0, ...\}
+\end{equation*}
+dont la période est 2 et évidamment dont les valeurs ne sont aussie variés qu'on le souhaite. On va parler plus tard en détail qu'est-ce que cela veut dire être
+``suffisamment variés''; pour l'instant on se contente de dire que cette suite-là n'atteint pas nos expectations. Heuresement pour nous, il y existe pleins de fonctions
+qui satisfaitent nos buts flous.
+
+\subsection{Générateur congruentiel linéaire}
+
+La méthode la plus directe à implementer pour générer une telle suite est dit \textit{générateur congruentiel linéaire}. Congruentiel parce qu'il s'agit d'une opération modulo et
+linéaire vu qu'il y est compris une transformation affine. Dans le cas général, on considère les fonctions de la forme:
+$$
+    f(x; a, c, m) = (ax + c) \bmod m.
+$$
+
+D'ailleurs, la fonction étudiée dans la section précedente est une générateur congruentiel linéaire dont les paramètres $a = 1$, $c = 1$, et $m = 2$. Ne vous inquiétez pas, ne pas tous les
+générateur congruentiel linéaire (LCG) sont fait de même qualité. Les choix des paramètres qui sont utilisés par des logiciels connus sont détaillé sur un page wikipédia et leurs propriétés déjà
+bien étudiés. Vu que l'objective de notre projet c'est d'approfondir la connaissance autour des méthodes pour générer les variables (pseudo) aléatoires, on a décidé d'implementer notre propre LCG hybride.
+Pour $m$, on choisit $2^{31} - 1$, un prime mersenne qui est très connu. Pour $a$, on s'amuse en choissisant $12345678$. Finalement, on affecte l'incrémenteur $c$ la valeur 1.
+$$
+    f_{sousmarin}(x) = (12345678x + 1) \bmod (2^{31} - 1)
+$$
+
+
+\subsection{Implémentation en R}
+Afin d'implémenter une version de notre fonction en le language de programmation R, on doit s'éloigner un peut du formalisme et s'orienter dans l'applications. C'est-à-dire qu'on va pas garder une valuer $x_0$
+pour toute l'éternité; on aura une variable globale déterminant l'état du générateur qui serait mis à jour quand on veut générer une suite des valeurs.
+
+% \lstset{language=R, caption=somecaption, keywords={smooth}}
+
+\begin{lstlisting}[language =R]
+
+    # Initialiser la graine (une variable globale) a 0
+    g_SEED_SOUSMARIN <- 0
+
+    # similaire a la fonction de R set.seed, mettre a jour
+    # la valeur de g_SEED_SOUSMARIN
+    set_seed <- function(seed) {
+        assign("g_SEED_SOUSMARIN", seed, envir = .GlobalEnv)
+    }
+
+    # La fonction LCG pure qu'on a defini en parti 3
+    f_sousmarin <- function(x) {
+        (12345678 * x + 1) %% (2^31 - 1)
+    }
+
+    # Generer une suite des variables de taille n en mettant a jour l'etat
+    # de la graine a chaque pas.
+    gen_suite <- function(n) {
+
+        suite <- vector("numeric", n) # allouer un vector de taille n
+
+        for (i in seq_len(n)) {
+            x_i <- f_sousmarin(g_SEED_SOUSMARIN)
+            suite[[i]] <- x_i
+            set_seed(x_i)
+        }
+
+        suite
+    }
+\end{lstlisting}
+
+On a donc implémenté notre propre LCG. Pour renvoyer une valeur dans l'interval ]0, 1[ afin de simuler $X \sim \mathcal{U}(0, 1)$, on remarque que
+la division modulo $m$ renvoi une valeur entre ]0, $m$[. Pour le normaliser, on divise par la facteur $m$.
+
+\begin{lstlisting}[language=R]
+
+    r_std_unif <- function(n) {
+
+        suite <- vector("numeric", n)
+
+        for (i in seq_len(n)) {
+            x_i <- f_sousmarin(g_SEED_SOUSMARIN)
+            suite[[i]] <- x_i / (2^31 - 1)
+            set_seed(x_i)
+        }
+
+        suite
+    }
+
+\end{lstlisting}
+
+On imite le comportement et la signature de la fonction dans R de base \texttt{runif} avec
+
+\begin{lstlisting}[language=R]
+
+    r_unif <- function(n, min = 0, max = 1) {
+
+        spread <- max - min
+        suite  <- vector("numeric", n)
+
+        for (i in seq_len(n)) {
+            x_i <- f_sousmarin(g_SEED_SOUSMARIN)
+            suite[[i]] <- (x_i * spread) / (2^31 - 1) + min
+            set_seed(x_i)
+        }
+
+        suite
+    }
+
+\end{lstlisting}
+
+
+\subsection{Tests statistiques d'une loi uniforme}
+
+\begin{figure}[h!]
+    \centering
+    \include{plots/uniform_histogram.tex}
+
+    \vspace{-1cm}
+    \caption{Histogram généré à partir d'un appel à \texttt{r\_unif} avec $n = 100000$}
+
+\end{figure}
+
+\subsection{Diehard}
+
+
+\end{document}
