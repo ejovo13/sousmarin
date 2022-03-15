@@ -70,11 +70,14 @@ df <- as_tibble(x)
 
 library(tikzDevice)
 
-tikz(file = "test.tex", width = 5, height = 3)
 
-df |> ggplot(aes(x)) +
-    geom_histogram(breaks = seq(0, 1, 0.0125), color = "black", fill = "#1076d4") +
-    # labs(title = "r\\_unif(n = 100000)") +
-    theme(plot.title = element_text(hjust = 0.5))
+# Write our graph to a .tex file
 
-dev.off()
+# tikz(file = "test.tex", width = 5, height = 3)
+
+# df |> ggplot(aes(x)) +
+#     geom_histogram(breaks = seq(0, 1, 0.0125), color = "black", fill = "#1076d4") +
+#     # labs(title = "r\\_unif(n = 100000)") +
+#     theme(plot.title = element_text(hjust = 0.5))
+
+# dev.off()

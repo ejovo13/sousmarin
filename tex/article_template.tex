@@ -32,6 +32,7 @@
 
 % \begin{abstract}
 % Abstract.
+
 % \end{abstract}
 
 % \renewcommand {\epigraphflush} {center}
@@ -55,7 +56,7 @@ disposition que des méthodes déterministes?
 % \setlength \epigraphwidth {\linewidth}
 
 On n'ose pas à répondre à cette question plus éloquemment que celle-ci offert par John von Neumann, l'un des meilleurs mathémathiciens, pionniers, informaticiens de tous les temps; générer des variables aléatoires sur un ordinateur n'est tout simplement pas possible.
-Cependant, cela ne nous empechera pas d'essayer quand même.
+Cependant, cela ne nous empechera pas d'essayer quand même\footnote{Il s'agira de produire des variables dites pseudo-aléatoires}.
 
 \section{Loi uniforme}
 
@@ -74,8 +75,8 @@ $$
 \right.
 $$
 
-On souhaite trouvé une fonction vérifianté certaines qualités désirées. Par exemple, on veut que notre fonction ait une période suffisamment long et qu'elle
-produise des valeurs très variés. Etudions la fonction $x \mapsto (x + 1) \mathbin{\%} 2$, où \% est l'opération de modulus et on fixe une graine $x_0 = 1$.
+On souhaite trouver une fonction qui vérifie certaines qualités désirées. Par exemple, on veut que notre fonction ait une période suffisamment long et qu'elle
+produise des valeurs uniformément réparti sur un interval. Etudions la fonction $x \mapsto (x + 1) \mathbin{\%} 2$, où \% est l'opération de modulus et on fixe une graine $x_0 = 1$.
 \begin{align*}
     f(x_0) &= (1 + 1) \mathbin{\%} 2 = 2 \mathbin{\%} 2 = 0 \\
     f(x_1) &= (0 + 1) \mathbin{\%} 2 = 1 \mathbin{\%} 2 = 1 \\
@@ -144,8 +145,8 @@ pour toute l'éternité; on aura une variable globale déterminant l'état du g�
     }
 \end{lstlisting}
 
-On a donc implémenté notre propre LCG. Pour renvoyer une valeur dans l'interval ]0, 1[ afin de simuler $X \sim \mathcal{U}(0, 1)$, on remarque que
-la division modulo $m$ renvoi une valeur entre ]0, $m$[. Pour le normaliser, on divise par la facteur $m$.
+On a donc implémenté notre propre LCG, \texttt{f\_sousmarin}. Pour renvoyer une valeur dans l'interval ]0, 1[ afin de simuler $X \sim \mathcal{U}(0, 1)$, on remarque que
+la division modulo $m$ renvoi une valeur entre ]0, $m - 1$[. Pour le normaliser, on divise par la facteur $m - 1 \equiv 2^{31} - 2$.
 
 \begin{lstlisting}[language=R]
 
@@ -155,7 +156,7 @@ la division modulo $m$ renvoi une valeur entre ]0, $m$[. Pour le normaliser, on 
 
         for (i in seq_len(n)) {
             x_i <- f_sousmarin(g_SEED_SOUSMARIN)
-            suite[[i]] <- x_i / (2^31 - 1)
+            suite[[i]] <- x_i / (2^31 - 2)
             set_seed(x_i)
         }
 
@@ -164,7 +165,12 @@ la division modulo $m$ renvoi une valeur entre ]0, $m$[. Pour le normaliser, on 
 
 \end{lstlisting}
 
-On imite le comportement et la signature de la fonction dans R de base \texttt{runif} avec
+Si on considère le cas générale où l'on souhaiterait générer des variables uniformément répartis dans l'interval ]$a$, $b$[, on commence tout d'abord
+en échantillonant $X \sim \mathcal{U}(0, 1)$. Ensuite, on multiplie $X$ par l'ećart entre $a$ et $b$, ($b - a$), pour produire une variable $X_{b - a} \in$ ]$0$, $b - a$[. Finalement,
+on décale $X_{b - a}$ en additionant $a$ pour finir avec le variable aléatoire uniformément réparti dans l'interval ]$0 + a, b - a + a$[ $\equiv $ ]$a, b$[. Après cette transformation affine appliqué à
+$X$, on finit avec $X_{a,b} \sim \mathcal{U}(a, b)$.
+
+On imite le comportement et la signature de la fonction dans R de base \texttt{runif} avec l'implémentation suivante
 
 \begin{lstlisting}[language=R]
 
@@ -175,7 +181,7 @@ On imite le comportement et la signature de la fonction dans R de base \texttt{r
 
         for (i in seq_len(n)) {
             x_i <- f_sousmarin(g_SEED_SOUSMARIN)
-            suite[[i]] <- (x_i * spread) / (2^31 - 1) + min
+            suite[[i]] <- (x_i * spread) / (2^31 - 2) + min
             set_seed(x_i)
         }
 
@@ -187,16 +193,54 @@ On imite le comportement et la signature de la fonction dans R de base \texttt{r
 
 \subsection{Tests statistiques d'une loi uniforme}
 
+Alors comment peut-on vérifier que notre LCG produisent des valeurs qui sont vraimenet répartis uniformément? Quand il s'agit de produire
+des milliards d'observations, on peut pas facilement vérifier à la main si notre fonction n'a pas de structure évidente (sauf la période qui est mathématiquement inévitable).
+Pourtant, on peut commencer avec une exploration visuelle.
+
+Pour ce faire, on utilise la fonction \texttt{r\_std\_unif} définie au-dessus pour générer 1E6 valeurs aléatoires qui sont supposés d'être uniformément
+répartis sur l'interval ]$0, 1$[.
+
 \begin{figure}[h!]
     \centering
     \include{plots/uniform_histogram.tex}
 
     \vspace{-1cm}
-    \caption{Histogram généré à partir d'un appel à \texttt{r\_unif} avec $n = 100000$}
+    \caption{Histogram généré à partir d'un appel à \texttt{r\_std\_unif} avec $n = 1000000$. On initiliase la graine de notre
+    générateur avec un appel à \texttt{set\_seed(0)}.}
 
 \end{figure}
 
+On peut aussi facilement constater que les statistiques de notre échantillon correspondent bien a celles-ci que l'on attend.
+
+\begin{lstlisting}[language=R]
+    library(sousmarin)
+
+    set_seed(0)
+    x <- r_std_unif(1E6)
+
+    mu  <- mean(x) # 0.5000658
+    sig <- std(x)  # 0.2877586
+\end{lstlisting}
+
+On réitère le simple fait qu'il n'y à \textbf{rien d'aléatoire} avec la génération de ces valeurs et que vous pouvez vérifier leurs quantité en
+téléchargant notre package \textbf{ICI}\footnote{On mettra ici un lien du github (voire un lien de CRAN????) et des intstruction pour télécharger notre package}.
+
+On passe à l'analyse. Avec notre échantillon $x$ de taille 1E6, le moyen de l'échantillon $\bar x = 0.50006584$ et l'écart type de l'échantillon est $s = 0.2877586$.
+Comme la moyenne d'une loi uniforme est $\frac{b - a}{2} = \frac{1 - 0}{2} = 0.5$, on est très satisfaits que $\bar x = 0.50006584 \sim 0.5$. Parallèlement, l'écart type
+d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.2886751$, ce qui n'est pas du tout loins de notre $s = 0.2877586$.
+
 \subsection{Diehard}
 
+My boy George Marsaglia
+
+\subsection{Vitesse}
+
+Les boucles en R sont \textbf{LENTS}. Genre horriblement lents. Pour la suite, on va implementer les fonctions en C en utilisant le package Rcpp. On va peut-etre
+explorer des autres optimisations au niveau de parallelisation, qui portera avec eux leurs propres problemes telles que les "data races" - quand deux "threads" essaye d'acceder et
+modifier l'etat du générateur en même temps.
+
+\section{Projections}
+
+Méthode de transormation inversé, méthode de rejet, Transforme Box-Muller.
 
 \end{document}
