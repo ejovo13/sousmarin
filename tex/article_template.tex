@@ -51,17 +51,16 @@
 Un ordinateur n'est qu'un gros agencement complexe des circuits. Regnées par les lois physiques, les opérations provenant du mouvement des électrons
 sont encodées par les fonctions booléennes. Les \textit{fonctions} - dans le sens mathématique - sont des objets purement déterministes. Autrement dit,
 une fonction associe à une donnée d'entrée, une unique valeur dans l'espace d'arrivée. Si on lui donne plusieurs fois la même valeur, par exemple $x_1$ et $x_2$
-telles que $x_1 = x_2$, la définition d'une fonction oblige que $f(x_1) = f(x_2)$. D'où vient l'énigme. Comment générer des variables aléatoires alors que nous
+telles que $x_1 = x_2$, la définition d'une fonction oblige que $f(x_1) = f(x_2)$. D'où vient la problématique : Comment générer des variables aléatoires alors que nous
 disposons seulement de méthodes déterministes?
 % \setlength \epigraphwidth {\linewidth}
 
-On ne pouvons pas à répondre à cette question plus éloquemment que le fait John von Neumann, l'un des meilleurs mathémathiciens, pionniers, informaticiens de tous les temps; générer des variables aléatoires sur un ordinateur est tout simplement impossible.
+Nous ne pouvons pas à répondre à cette question plus éloquemment que le fait John von Neumann, l'un des meilleurs mathémathiciens, pionniers, informaticiens de tous les temps; générer des variables aléatoires sur un ordinateur est tout simplement impossible.
 Cependant, cela ne nous empêchera pas d'essayer quand même\footnote{Il s'agira de produire des variables dites pseudo-aléatoires}.
 
 \section{Loi uniforme}
 
-On commence notre projet en étudiant la loi la plus simple parmi les lois usuelles - la loi uniforme. Tout d'abord, parce qu'elle est simple, mais la loi uniforme va également nous permettre construire des algorithmes plus complexes, notamment la méthode de la transormée inverse ou la méthode de rejet. Ainsi, cela nous permettra de simuler differentes lois, comme la loi normale, la loi exponentielle, etc. Il s'agira principalement d'échantilloner une variable $X\sim \mathcal{U}(0, 1)$ puis ensuite d'effectuer des manipulations
-mathématiques pour produire une variable suivant une autre loi ciblée.
+On commence notre projet en étudiant la loi la plus simple parmi les lois usuelles - la loi uniforme. Tout d'abord, parce qu'elle est simple, mais la loi uniforme va également nous permettre construire des algorithmes plus complexes, notamment la méthode de la transormée inverse ou la méthode de rejet. Ainsi, cela nous permettra de simuler différentes lois, comme la loi normale, la loi exponentielle, etc. Il s'agira principalement d'échantilloner une variable $X\sim \mathcal{U}(0, 1)$ puis ensuite d'effectuer des manipulations mathématiques pour produire une variable suivant une autre loi ciblée.
 
 Alors sans plus tarder, on formalise nos objectifs. Le principe est le suivant: nous allons générer une suite $(x_n$) à partir d'une graine $x_0$ et une fonction $f : \mathbb{R} \longrightarrow \mathbb{R}$ telle que
 $$
@@ -74,7 +73,7 @@ $$
 $$
 
 On souhaite trouver une fonction qui vérifie certaines qualités désirées. Par exemple, on veut que notre fonction ait une période suffisamment longue et qu'elle
-produise des valeurs uniformément réparties sur un intervalle. Etudions la fonction $x \mapsto (x + 1) \mathbin{\%} 2$, où \% est l'opération de modulus et on fixe une graine $x_0 = 1$.
+produise des valeurs uniformément réparties sur un intervalle. Etudions la fonction $x \mapsto (x + 1) \mathbin{\%} 2$, où \% est l'opération de modulos et on fixe une graine $x_0 = 1$.
 \begin{align*}
     f(x_0) &= (1 + 1) \mathbin{\%} 2 = 2 \mathbin{\%} 2 = 0 \\
     f(x_1) &= (0 + 1) \mathbin{\%} 2 = 1 \mathbin{\%} 2 = 1 \\
@@ -98,7 +97,7 @@ $$
 
 D'ailleurs, la fonction étudiée dans la section précédente est un générateur congruentiel linéaire dont les paramètres sont $a = 1$, $c = 1$, et $m = 2$. Ne vous inquiétez pas, il existe un large panel de
 générateurs congruentiels linéaires (LCG). Les choix des paramètres utilisés par les logiciels connus sont détaillés sur une page Wikipédia et leurs propriétés sont déjà
-bien étudiées. Vu que l'objectif de notre projet est d'approfondir la connaissance autour des méthodes pour générer dess (pseudo) aléatoires, on a décidé d'implémenter notre propre LCG hybride.
+bien étudiées. Vu que l'objectif de notre projet est d'approfondir la connaissance autour des méthodes pour générer des variables (pseudo) aléatoires, on a décidé d'implémenter notre propre LCG hybride.
 Pour $m$, on choisit $2^{31} - 1$, un prime mersenne qui est très connu. Pour $a$, on s'amuse en choissisant $12345678$. Finalement, on affecte à l'incrémenteur $c$ la valeur 1.
 $$
     f_{sousmarin}(x) = (12345678x + 1) \bmod (2^{31} - 1)
@@ -165,7 +164,7 @@ la division modulo $m$ renvoie une valeur entre ]0, $m - 1$[. Pour le normaliser
 
 Si on considère le cas général où l'on souhaiterait générer des variables uniformément réparties dans l'intervalle ]$a$, $b$[, on commence tout d'abord
 par échantillonner $X \sim \mathcal{U}(0, 1)$. Ensuite, on multiplie $X$ par l'écart entre $a$ et $b$, ($b - a$), pour produire une variable $X_{b - a} \in$ ]$0$, $b - a$[. Finalement,
-on décale $X_{b - a}$ en additionnant $a$ pour finir avec la variable aléatoire uniformément répartie dans l'interval ]$0 + a, b - a + a$[ $\equiv $ ]$a, b$[. Après cette transformation affine appliquée à
+on décale $X_{b - a}$ en additionnant $a$ pour finir avec la variable aléatoire uniformément répartie dans l'intervalle ]$0 + a, b - a + a$[ $\equiv $ ]$a, b$[. Après cette transformation affine appliquée à
 $X$, nous avons $X_{a,b} \sim \mathcal{U}(a, b)$.
 
 On imite le comportement et la signature de la fonction dans R de base \texttt{runif} avec l'implémentation suivante
