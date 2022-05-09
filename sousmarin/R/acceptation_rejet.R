@@ -107,6 +107,7 @@ library(tidyverse)
 library(tibble)
 library(purrr)
 library(magrittr)
+library(tikzDevice)
 
 n <- 1e3
 x_std <- rnorm_acc_std(n)
@@ -178,18 +179,25 @@ df_count %<>%
   mutate(link = as.factor(1:length(N)))
 
 
-# tikzDevice::tikz(file = "./df_bis_ucmp_reg.tex", width = 7, height = 3)
+# tikzDevice::tikz(file = "./avg_count.tex", width = 7, height = 3)
+
+reg <- lm(nrej ~ N, data = df_count)
 
 df_count |>
-  ggplot(aes(N, nrej)) +
-  geom_point(size =0.25) +
-  geom_line(aes(N, nrej_vs_N), size = 0.25) +
-  geom_line(aes(N, nrej_vs_N), color = "red", alpha = 0.3) +
-  geom_segment(aes(N, nrej_vs_N, xend = N, yend = nrej), color = "red") +
-  labs(
-      title = "Moyenne des comparaisons",
-      subtitle = "$\\texttt{nombreComparaisons}(n) \\approx 1.16(n\\log n) - 549.56$",
-      x = "$n$",
-      y = ""
-    #   y = "$f(x) = 1.16x - 549.56$"
-    )
+    ggplot(aes(N, nrej)) +
+    geom_point(size = 0.25) +
+    geom_line(aes(N, nrej_vs_N), size = 0.25) +
+    geom_line(aes(N, nrej_vs_N), color = "red", alpha = 0.3) +
+    geom_segment(aes(N, nrej_vs_N, xend = N, yend = nrej), color = "red") +
+    labs(
+        title = "Moyenne des rejections par valeur echantillon",
+        #   subtitle = paste("$\\texttt{nrej}(n) \\approx", regression$N, "n + 1.3x"),
+        #   subtitle = "hi",
+        subtitle = paste("$\\texttt{nrej}(n) \\approx", round(reg$coefficients["N"], digits = 2), "n + ", round(reg$coefficients[[1]], 2), sep = ""),
+        x = "$n$",
+        y = ""
+        #   y = "$f(x) = 1.16x - 549.56$"
+        )
+
+# dev.off()
+regression
