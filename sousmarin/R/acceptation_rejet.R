@@ -116,13 +116,13 @@ x_10_12 <- rnorm_acc(n, 10, 12)
 
 
 df <- tibble(x_std, x_1_5, x_10_12)
-df |>
-    ggplot(aes(x = x_std)) +
-    geom_density() +
-    geom_density(aes(x_1_5), col = "red") +
-    geom_density(aes(x_10_12), col = "blue") +
-    scale_color_manual("", values = "norm, norm2, norm3") +
-    labs()
+# df |>
+#     ggplot(aes(x = x_std)) +
+#     geom_density() +
+#     geom_density(aes(x_1_5), col = "red") +
+#     geom_density(aes(x_10_12), col = "blue") +
+#     scale_color_manual("", values = "norm, norm2, norm3") +
+#     labs()
 
 m_list <- rnorm_acc_count(n)
 
@@ -179,7 +179,7 @@ df_count %<>%
   mutate(link = as.factor(1:length(N)))
 
 
-# tikzDevice::tikz(file = "./avg_count.tex", width = 7, height = 3)
+tikzDevice::tikz(file = "./avg_count_acc_rej.tex", width = 5, height = 3)
 
 reg <- lm(nrej ~ N, data = df_count)
 
@@ -190,14 +190,13 @@ df_count |>
     geom_line(aes(N, nrej_vs_N), color = "red", alpha = 0.3) +
     geom_segment(aes(N, nrej_vs_N, xend = N, yend = nrej), color = "red") +
     labs(
-        title = "Moyenne des rejections par valeur echantillon",
+        title = "Moyenne des rejections",
         #   subtitle = paste("$\\texttt{nrej}(n) \\approx", regression$N, "n + 1.3x"),
         #   subtitle = "hi",
-        subtitle = paste("$\\texttt{nrej}(n) \\approx", round(reg$coefficients["N"], digits = 2), "n + ", round(reg$coefficients[[1]], 2), sep = ""),
+        subtitle = "Pour n realisations d'une variable aleatoire normale",
         x = "$n$",
-        y = ""
+        y = paste("$\\texttt{nrej}(n) \\approx ", round(reg$coefficients["N"], digits = 2), "n$", sep = ""),
         #   y = "$f(x) = 1.16x - 549.56$"
         )
 
-# dev.off()
-regression
+dev.off()

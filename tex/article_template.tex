@@ -239,4 +239,51 @@ de modifier l'état du générateur en même temps.
 
 Méthode de transormation inversée, méthode de rejet, Transforme Box-Muller.
 
+\section{Methode de transformation inversee}
+
+La methode de transformation inversee consiste a echantilloner une variable aleatoire $X \sim \mathcal{U}(0, 1)$ et utiliser l'expression analytique
+de la fonction de repartition d'une loi cible. Comme la fonction de repartition $F(x$) est une fonction croissante definie sur $\mathbb{R}^n$ a des valeurs dans
+$[0, 1]$, si on peut trouver une expression fermee de son inverse $F^{-1} : [0, 1] \longrightarrow \mathbb{R}$, on applique la methode de transformation inversee
+afin de realiser des simulations.
+
+Pour eclairer la methode, on va etudier la fonction de repartion de la loi exponentielle. Pour rappel, une variable aleatoire suivant une loi exponentielle de parametre
+$\lambda$ a pour fonction de densite $f(x) = \lambda e^{-\lambda x}$ pour $x \geq 0$, $0$ sinon. On a fait expres de choisir cette loi parce qu'elle est muni avec une fonction de repartition aisement calculable
+et, plus importamment, dont l'inverse a une expression analytique. On continue pour calculer sa fonction de repartition:
+\begin{align*}
+    F(x) &= \int_{-\infty}^xf(t)dt \\
+    & = \int_{-\infty}^0 0 dt + \int_0^x \lambda e^{-\lambda t} dt \\
+    &= 0 + \left[-e^{-\lambda t}\right]_0^x \\
+    &= 1 - e^{-\lambda x}
+\end{align*}
+
+Avec cette expression on procede pour trouver l'inverse, $F^{-1}$ :
+\begin{align*}
+    y &= 1 - e^{-\lambda (F^{-1}(y))} \\
+    e^{\lambda (F^{-1}(y))} &= 1 - y \\
+    -\lambda F^{-1}(y) &= \ln(1 - y) \\
+    F^{-1}(y) &= \frac{-\ln(1 - y)}{\lambda}
+\end{align*}
+
+La loi exponentielle est l'une des peu loi ou on peut facilement trouver une expression ferme de l'inverse de sa fonction de repartion. Cela nous permet
+d'echantilloner une variable aleatoire $X \sim \exp(\lambda)$ efficacement a partir d'une seule realisation d'une loi uniformer. Il s'agit tout
+simplement de tirer $U \sim \mathcal{U}(0, 1)$ et ensuite evaluer $X = F^{-1}(U)$.
+
+L'implementation en R n'est qu'une seule ligne:
+
+\begin{lstlisting}[language=R]
+    rexp_inv <- function(n, lambda = 1) {
+        # Generate n realizations of a uniform random variable n times
+        (-1 / lambda) * log(runif(n, 0, 1))
+    }
+\end{lstlisting}
+
+
+\section{Methode d'acceptation-rejet}
+
+\begin{figure}[h!]
+\centering
+\include{plots/avg_count_acc_rej.tex}
+\caption{}
+\end{figure}
+
 \end{document}

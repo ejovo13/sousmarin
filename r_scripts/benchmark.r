@@ -9,6 +9,9 @@ library(pracma)
 library(purrr)
 library(microbenchmark)
 
+# fn is a function used to generate a random variable n times, accepting
+# only n as a parameter.
+# So, we can use this to time any of our custom variables
 time_rng <- function(fn = runif, exp_min = 2, exp_max = 6, n = 10) {
 
     N <- logspace(exp_min, exp_max, n)
