@@ -54,8 +54,8 @@ ui <- fluidPage(
                        numericInput("lambda", "lambda", 1),
       ),
       conditionalPanel(condition="input.Distribution == 'Gaussian vector'",
-                       numericInput("Col ", "Col", 2),
-                       numericInput("row", "row", 2),
+                       numericInput("Col ", "Col", 4),
+                       numericInput("row", "row", 4),
                        matrixInput(
                          "myMatrix",
                          value = diag(4),
