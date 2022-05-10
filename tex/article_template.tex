@@ -8,7 +8,7 @@
 
 \title{Simulation conditionnelle d’un processus gaussien}
 \author{NEEL Pauline, PETROS Russom Samson, RAKOTOVAO Jonathan, VOYLES Evan}
-\date{15 Mars 2022}
+\date{10 Mai 2022}
 
 
 \begin{document}
@@ -228,11 +228,11 @@ d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.28
 
 \subsection{Diehard}
 
-My boy George Marsaglia
+% My boy George Marsaglia
 
 \subsection{Vitesse}
 
-Les boucles en R sont \textbf{LENTES}. Genre horriblement lentes. Pour la suite, on va implémenter les fonctions en C en utilisant le package Rcpp. Pour suivre, nous tentons d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
+Les boucles en R sont \textbf{LENTES}. Genre horriblement lentes. Pour la suite, on va implémenter les fonctions en C en utilisant le package Rcpp\footnote{Il se peut que l'on aura pas assez de temps pour realiser ca}. Pour suivre, nous tentons d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
 de modifier l'état du générateur en même temps.
 
 \section{Projections}
@@ -279,7 +279,7 @@ L'implémentation en R ne prend qu'une seule ligne:
 
 
 \section{Methode d'acceptation-rejet}
-Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet. Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur [0, 1] . 
+Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet. Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur [0, 1] .
 
 Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis dans le rectangle noir.Suppons que l'on souhaite simuler 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points. Ensuite, pour chaque abscisses, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tirer des points uniformément répartis dans le rectangle. Finalement, on garde seulement ceux se trouvant en desous de la fonction $f(x)$. Ainsi, l'ensemble de ces points seront bien distribués selon la loi $f(x)$
 \begin{figure}[h!]
@@ -295,23 +295,27 @@ Pour faire la simulation sans passer par du code R, nous avons créé une interf
 cette interface est implémentée avec la bibliothèque Rshiny, cette bibliothèque est simple à utiliser et permet de créer des sitewebs
 avec des applications(fonctions) qui s'exécutent en arrière-plan pour faire la simulation.
 
-Nous n'avons pas encore terminé de coder l'application mais dans la version finale l'utilisateur aura le choix de télécharger les variables 
+Nous n'avons pas encore terminé de coder l'application mais dans la version finale l'utilisateur aura le choix de télécharger les variables
 Aléatoires simulés.
 
-\begin{figure}
+\begin{figure}[h!]
 \centering
-\include{media/apppic1.png}
+\includegraphics[width=\linewidth]{media/apppic1.png}
+\vspace{-5cm}
 \caption{app shiny pour faire la simulation}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 \centering
-\include{media/apppic2.png}
+\includegraphics[height=8cm]{media/apppic2.png}
 \caption{choix de distributions}
 \end{figure}
 
 
+\section{Réflexions}
 
+Ce projet d'initiation a été une véritable découverte pour nous, puisque on a appris à utiliser de nouveaux langages de programmation, R et Rshiny. De plus, on a découvert la simulation de variables aléatoires multivariées qui sont utiles lorsque l'on veut simuler certains phénomènes physiques.
+met plustot ce que je viens d'envoyer, merci encore
 
 
 \end{document}
