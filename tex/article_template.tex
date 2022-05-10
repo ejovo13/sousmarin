@@ -279,7 +279,9 @@ L'implémentation en R ne prend qu'une seule ligne:
 
 
 \section{Methode d'acceptation-rejet}
+Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet. Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur [0, 1] . 
 
+Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis dans le rectangle noir.Suppons que l'on souhaite simuler 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points. Ensuite, pour chaque abscisses, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tirer des points uniformément répartis dans le rectangle. Finalement, on garde seulement ceux se trouvant en desous de la fonction $f(x)$. Ainsi, l'ensemble de ces points seront bien distribués selon la loi $f(x)$
 \begin{figure}[h!]
 \centering
 \include{plots/avg_count_acc_rej.tex}
