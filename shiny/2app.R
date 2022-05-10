@@ -58,7 +58,7 @@ ui <- fluidPage(
                        numericInput("row", "row", 2),
                        matrixInput(
                          "myMatrix",
-                         value = diag(3),
+                         value = diag(4),
                          rows = list(names = FALSE),
                          cols = list(names = FALSE)
                        )
