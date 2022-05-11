@@ -57,7 +57,6 @@ symmetrize <- function(H) {
     (H + t(H)) / 2
 }
 
-
 #' Sample from the gaussian orthogonal ensemble
 #'
 #' We first generate a matrix whose elements are independent variables taken from a univariate

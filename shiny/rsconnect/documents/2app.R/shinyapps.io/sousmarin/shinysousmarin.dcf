@@ -1,0 +1,14 @@
+name: shinysousmarin
+title: shinysousmarin
+username:
+account: sousmarin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6279979
+bundleId: 5895008
+url: https://sousmarin.shinyapps.io/shinysousmarin/
+when: 1652274187.53039
+lastSyncTime: 1652274187.53039
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: app.R
