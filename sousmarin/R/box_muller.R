@@ -1,19 +1,21 @@
+#` @include lcg.r
+
 
 box_muller = function(u1, u2){
-  
+
   z1 = sqrt(-2*log(u1))*cos(2*pi*u2)
   z2 = sqrt(-2*log(u1))*sin(2*pi*u2)
-  
+
   z = numeric(length(u1)*2)
-  
+
   for (i in 1:length(u1)){
     z[i] = z1[i]
   }
-  
+
   for (i in 1:length(u1)){
     z[i+length(u1)] = z2[i]
   }
-  
+
   z
 }
 
@@ -35,4 +37,4 @@ box_muller_gauss_nous = function(n){
   box_muller(u1,u2)
 }
 
-hist(box_muller_gauss(1000000))
+# hist(box_muller_gauss(1000000))
