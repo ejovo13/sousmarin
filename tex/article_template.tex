@@ -46,6 +46,8 @@
 
 \pagestyle{fancy}
 
+\tableofcontents
+
 \section{Introduction}
 
 
@@ -58,7 +60,7 @@ On se placera ensuite dans un cadre multivarié : nous utiliserons la décomposi
 De plus, en utilisant Rshiny nous coderons une application web qui permettra à des utilisateurs de générer puis de visualiser des réalisations de variables aléatoires, vecteurs ou processus gaussiens. 
 
 
-\section{Génération de variables aléatoires}
+\section{Problématique - génération de variables aléatoires}
 
 
 Un ordinateur n'est qu'un gros agencement complexe de circuits. Régnées par les lois physiques, les opérations provenant du mouvement des électrons
@@ -247,18 +249,10 @@ On passe à l'analyse. Avec notre échantillon $x$ de taille 1E6, le moyen de l'
 Comme la moyenne d'une loi uniforme est $\frac{b - a}{2} = \frac{1 - 0}{2} = 0.5$, nous sommes ravis de voir que $\bar x = 0.50006584 \sim 0.5$. Parallèlement, l'écart type
 d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.2886751$, ce qui est proche de notre $s = 0.2877586$.
 
-\subsection{Diehard}
 
-% My boy George Marsaglia
+\section{Simulation de différentes lois}
 
-\subsection{Vitesse}
-
-Les boucles en R sont \textbf{LENTES}. Genre horriblement lentes. Pour la suite, on va implémenter les fonctions en C en utilisant le package Rcpp\footnote{Il se peut que l'on aura pas assez de temps pour realiser ca}. Pour suivre, nous tentons d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
-de modifier l'état du générateur en même temps.
-
-\section{Projections}
-
-Méthode de transormation inversée, méthode de rejet, Transforme Box-Muller.
+Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Les algorithmes seront tous contruits à partir de runif.
 
 \section{Méthode de transformation inversée}
 
@@ -298,11 +292,44 @@ L'implémentation en R ne prend qu'une seule ligne:
     }
 \end{lstlisting}
 
-
 \section{Methode d'acceptation-rejet}
-Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet. Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur [0, 1] .
 
-Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis dans le rectangle noir. Supposons que l'on souhaite simuler 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points. Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces points seront bien distribués selon la loi $f(x)$
+Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet. 
+
+Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur le compact [0, 1] .
+
+Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis sous la courbe de $g(x)$. Supposons que l'on souhaite générer 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points. 
+
+Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces points seront bien distribués selon la loi $f(x)$.
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\linewidth]{media/graph_acceptation_rejet.png}
+
+\caption{app shiny pour faire la simulation}
+\end{figure}
+
+Sur ce graphique, on voit que les points en rouge se situant au-dessus de $f(x)$ seront rejetés tandis que les points blancs se situant en-dessous de la courbe seront acceptés. 
+
+\subsection{Loi normale}
+
+Cette méthode est très utilisée pour simuler la loi normale. Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
+Alors, nous majorons la fonction densité $f(x)$ en rouge de la loi normale par $g(x)$, la densité de la loi "double exponentielle" en vert qui correspond à une variable exponentielle exp(1) affectée d'un signe + ou -, tiré avec probabilité 0.5.
+
+Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f(x)$.
+
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.3]{media/desmos-graph.png}
+\caption{Fonctions densités}
+\end{figure}
+
+
+\newpage
+
 \begin{figure}[h!]
 \centering
 \include{plots/avg_count_acc_rej.tex}
@@ -332,7 +359,15 @@ Aléatoires simulés.
 \caption{choix de distributions}
 \end{figure}
 
+\section{Conclusion}
 
+Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation mutlivariée et en spatial. Pour cela nous avons utilisé les méthode de 
+
+\section{Ce que nous pourrions amélirorer}
+\subsection{Vitesse}
+
+Les boucles en R sont \textbf{LENTES}. Genre horriblement lentes. Pour la suite, on va implémenter les fonctions en C en utilisant le package Rcpp\footnote{Il se peut que l'on aura pas assez de temps pour realiser ca}. Pour suivre, nous tentons d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
+de modifier l'état du générateur en même temps.
 \section{Réflexions}
 
 Ce projet d'initiation a été une véritable découverte pour nous, puisque on a appris à utiliser de nouveaux langages de programmation, R et Rshiny. De plus, on a découvert la simulation de variables aléatoires multivariées qui sont utiles lorsque l'on veut simuler certains phénomènes physiques.
