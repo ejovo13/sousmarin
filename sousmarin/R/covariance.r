@@ -10,8 +10,8 @@ B <- matrix(runif(20), ncol = 5, nrow = 4)
 # data frame or a matrix
 
 xy <- c(x, y)
-m <- matrix(xy, nrow = 10, ncol = 2)
-print(m)
+# m <- matrix(xy, nrow = 10, ncol = 2)
+# print(m)
 
 ones <- function(mat) {
     # nc <- ncol(mat)

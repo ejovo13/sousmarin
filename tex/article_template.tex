@@ -50,22 +50,22 @@
 
 \section{Introduction}
 
+L’objectif principal de ce projet est d’étudier et d’implémenter une procédure permettant de générer des simulations conditionnelles de processus gaussiens à l’aide de la méthode spectrale et du krigeage. Nous procéderons pour cela pas à pas.
 
-L’objectif principal de ce projet est d’étudier et d’implémenter une procédure permettant de générer des simulations conditionnelles de processus gaussiens à l’aide de la méthode spectrale et du krigeage. Nous procéderons pour cela pas à pas. 
-
-La première étape sera d’abord d’appréhender ce qu’est un algorithme de simulation et de comprendre comment cela fonctionne. Nous commencerons donc ce projet par une question simple : comment générer des réalisations d’une variable aléatoire normale (cadre univarié). Pour y répondre, nous allons s’intéresser à la méthode d’acceptation-rejet ainsi qu’à la méthode de Box-Muller. 
+La première étape sera d’abord d’appréhender ce qu’est un algorithme de simulation et de comprendre comment cela fonctionne. Nous commencerons donc ce projet par une question simple : comment générer des réalisations d’une variable aléatoire normale (cadre univarié). Pour y répondre, nous allons s’intéresser à la méthode d’acceptation-rejet ainsi qu’à la méthode de Box-Muller.
 
 On se placera ensuite dans un cadre multivarié : nous utiliserons la décomposition de Cholesky de la matrice de variance-covariance afin de générer des réalisations d’un vecteur gaussien. Enfin, dans un cadre spatial, nous simulerons des processus gaussiens grâce à la méthode spectrale, puis conditionnerons les simulations obtenues à l’aide du krigeage. L’implémentation des différents algorithmes se fera sous R.
 
-De plus, en utilisant Rshiny nous coderons une application web qui permettra à des utilisateurs de générer puis de visualiser des réalisations de variables aléatoires, vecteurs ou processus gaussiens. 
+De plus, en utilisant Rshiny nous coderons une application web qui permettra à des utilisateurs de générer puis de visualiser des réalisations de variables aléatoires, vecteurs ou processus gaussiens.
 
 
-\section{Problématique - génération de variables aléatoires}
+\section{Simulation classique}
+\subsection{Génération de variables aléatoires}
 
 
 Un ordinateur n'est qu'un gros agencement complexe de circuits. Régnées par les lois physiques, les opérations provenant du mouvement des électrons
 sont encodées par les fonctions booléennes. Les \textit{fonctions} - dans le sens mathématique - sont des objets purement déterministes. Autrement dit,
-une fonction associe à une donnée d'entrée, une unique valeur dans l'espace d'arrivée. 
+une fonction associe à une donnée d'entrée, une unique valeur dans l'espace d'arrivée.
 
 Si on lui donne plusieurs fois la même valeur, par exemple $x_1$ et $x_2$
 telles que $x_1 = x_2$, la définition d'une fonction implique que $f(x_1) = f(x_2)$. D'où vient l'énigme : Comment générer des variables aléatoires alors que nous
@@ -75,9 +75,9 @@ disposons seulement de méthodes déterministes?
 Nous ne pouvons pas à répondre à cette question plus éloquemment que le fait John von Neumann, l'un des meilleurs mathématiciens, pionniers, informaticiens de tous les temps; générer des variables aléatoires sur un ordinateur est tout simplement impossible.
 Cependant, cela ne nous empêchera pas d'essayer quand même. Il s'agira de produire des variables dites pseudo-aléatoires.
 
-\section{Loi uniforme}
+\subsection{Loi uniforme}
 
-On commence notre projet en étudiant la loi la plus simple parmi les lois usuelles - la loi uniforme. Tout d'abord, parce qu'elle est simple, mais la loi uniforme va également nous permettre de construire des algorithmes plus complexes, notamment la méthode de la transformée inverse ou la méthode de rejet. Ainsi, cela nous permettra de simuler différentes lois, comme la loi normale, la loi exponentielle, etc. 
+On commence notre projet en étudiant la loi la plus simple parmi les lois usuelles - la loi uniforme. Tout d'abord, parce qu'elle est simple, mais la loi uniforme va également nous permettre de construire des algorithmes plus complexes, notamment la méthode de la transformée inverse ou la méthode de rejet. Ainsi, cela nous permettra de simuler différentes lois, comme la loi normale, la loi exponentielle, etc.
 
 Il s'agira principalement d'échantillonner une variable $X\sim \mathcal{U}(0, 1)$ puis ensuite d'effectuer des manipulations mathématiques pour produire une variable suivant une autre loi ciblée.
 
@@ -105,12 +105,12 @@ Cette fonction produit alors la suite
     \{1, 0, 1, 0, 1, 0, 1, 0, ...\}
 \end{equation*}
 dont la période est 2 et évidemment dont les valeurs ne sont pas aussi variées qu'on le souhaite. Nous verrons plus précisement ce que
-``suffisamment variés'' veut dire. Pour l'instant, on se contente de dire que cette suite-là n'atteint pas nos attentes. 
+``suffisamment variés'' veut dire. Pour l'instant, on se contente de dire que cette suite-là n'atteint pas nos attentes.
 
 Heureusement pour nous, il existe de nombreuses fonctions
 qui remplissent nos critères recherchés, ce sont des fonctions pseudo-aléatoires, elles sont déterminées mais leurs comportements s'approchent de l'aléatoire.
 
-\subsection{Générateur congruentiel linéaire}
+\subsubsection{Générateur congruentiel linéaire}
 
 La méthode la plus directe à implémenter pour générer une telle suite est un \textit{générateur congruentiel linéaire}. Congruentiel parce qu'il s'agit d'une opération modulo et
 linéaire vu qu'il y a une transformation affine. Dans le cas général, on considère les fonctions de la forme:
@@ -127,9 +127,9 @@ $$
 $$
 
 
-\subsection{Implémentation en R}
-Dans ce projet, nous faisons le choix d'implémenter notre propre version de runif afin de comprendre en profondeur la notion d'aléatoire. En effet, toutes les autres lois que nous allons pouvoir simuler, seront construites à partir de runif. Il était donc important pour nous de faire cette étape. Afin d'implémenter une version de notre fonction en langage de programmation R, on doit s'éloigner un peu de la pureté de la théorie et se salir les mains dans le code ! C'est-à-dire que l'on ne va pas garder une valeur $x_0$
-pour toute l'éternité; on aura une variable globale déterminant l'état du générateur qui serait mis à jour quand on veut générer une suite de valeurs.
+\subsubsection{Implémentation en R}
+Dans ce projet, nous faisons le choix d'implémenter notre propre version de runif afin de comprendre en profondeur la notion d'aléatoire. En effet, toutes les autres lois que nous allons pouvoir simuler, seront constuites à partir de runif. Il était donc important pour nous de faire cette étape. Afin d'implémenter une version de notre fonction en language de programmation R, on doit s'éloigner un peu de la pureté de la théorie et se salir les mains dans le code ! C'est-à-dire que l'on ne va pas garder une valeur $x_0$
+pour toute l'éternité; on aura une variable globale déterminant l'état du générateur qui serait mise à jour quand on veut générer une suite de valeurs.
 
 % \lstset{language=R, caption=somecaption, keywords={smooth}}
 
@@ -211,7 +211,7 @@ On imite le comportement et la signature de la fonction dans R de base \texttt{r
 \end{lstlisting}
 
 
-\subsection{Vérification pour la loi uniforme}
+\subsubsection{Vérification pour la loi uniforme}
 
 Comment vérifier que notre LCG produit des valeurs qui sont véritablement réparties uniformément ? Quand il s'agit de produire
 des milliards d'observations, on ne peut pas facilement vérifier à la main si notre fonction n'a pas de structure évidente (sauf la période qui est mathématiquement inévitable).
@@ -336,8 +336,14 @@ Grâce à la méthode d'inversion, nous savons simuler des réalisations selon l
 \caption{}
 \end{figure}
 
+\section{Simulation géostatistique}
 
-\section{R shiny}
+\subsection{Motivation}
+
+
+Le monde de simulation classique opère sous l'hypothèse d'indépendance des réalisations successives.
+
+\subsection{R shiny}
 
 Pour faire la simulation sans passer par du code R, nous avons créé une interface web afin de récupérer les variables simulées.
 cette interface est implémentée avec la bibliothèque Rshiny, cette bibliothèque est simple à utiliser et permet de créer des sitewebs

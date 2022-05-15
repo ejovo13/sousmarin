@@ -179,7 +179,7 @@ df_count %<>%
   mutate(link = as.factor(1:length(N)))
 
 
-tikzDevice::tikz(file = "./avg_count_acc_rej.tex", width = 5, height = 3)
+# tikzDevice::tikz(file = "./avg_count_acc_rej.tex", width = 5, height = 3)
 
 reg <- lm(nrej ~ N, data = df_count)
 
@@ -199,4 +199,4 @@ df_count |>
         #   y = "$f(x) = 1.16x - 549.56$"
         )
 
-dev.off()
+# dev.off()
