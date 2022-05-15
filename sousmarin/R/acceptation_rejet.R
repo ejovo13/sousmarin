@@ -1,37 +1,65 @@
 library(pracma)
 
-# f = function(x){
+#on simule pour une fonction sur un compact [0,1]
+#on majore par un rectangle
 
-#   if (x>=0 && x<=1){
-#      z= 6*x*(1-x)
-#   } else {
-#     z =0
-#   }
-#   z
-# }
+#' @export
+acceptationrejet = function(f,N,a,b,M){
+  z = numeric(N)
+  j=0
+  while(j != N){
+    X = runif(1)*(b-a) + a
+    Y = runif(1)*M
+    if(Y<=f(X)){
+      z[j]=X
+      j=j+1
+    }
+  }
+  z
+}
 
-# #on simule pour une fonction sur un compact [0,1]
-# #on majore par un rectangle
+# Generate a random variable following the quadratic dsitribution
+# f(x) = 6x(1 - x) between [0, 1] via accept-reject using the bounded function
+# g(x) = 1, with c = 1.5
+#
+# 1. generate a rv Y distributed as Unif(0, 1)
+# 2. generate U ~ Unif(0, 1)
+# 3. if U <= f(Y) / c g(Y), then accept our Y
+#' @export
+rquad <- function(n) {
 
-# acceptationrejet = function(f,N,a,b,M){
-#   z = numeric(N)
-#   j=0
-#   while(j != N){
-#     X = runif(1)*(b-a) + a
-#     Y = runif(1)*M
-#     if(Y<=f(X)){
-#       z[j]=X
-#       j=j+1
-#     }
-#   }
-#   z
-# }
+    ind <- function(x) { 0 <= x & x <= 1 }
+    # Uniform density between (0, 1)
+    f <- function(x) {
+        6 * x * (1 - x) * ind(x)
+    }
 
-# x=linspace(0,1)
-# y=f(x)
-# plot(x,y)
-# acceptationrejet(f,10,0,1,1.5)
+    g <- function(x) {
+        1 * ind(x)
+    }
 
+    c <- 1.5
+    out <- rep(0, n)
+
+    for (i in seq_len(n)) {
+
+        reject <- TRUE
+        z <- 0
+
+        while (reject) {
+
+            y <- runif(1)
+            u <- runif(1)
+
+            reject <- u > (f(y) / (c * g(y)))
+            z <- y
+        }
+
+        out[[i]] <- z
+    }
+
+    out
+}
 
 # ====================== Normal Distributions ==================== #
 # Simulate n realizations of a standard normal distribution

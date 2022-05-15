@@ -12,6 +12,7 @@ library(shinyMatrix)
 library(sousmarin)
 library(MASS)
 library(tibble)
+library(testit)
 
 
 

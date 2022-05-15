@@ -6,6 +6,49 @@ library(tibble)
 library(purrr)
 library(magrittr)
 library(tikzDevice)
+library(pracma)
+
+
+# ====================== Acceptation rejet for f(x) = 6x(1 - x) =====#
+f = function(x){
+
+  if (x>=0 && x<=1){
+     z= 6*x*(1-x)
+  } else {
+    z =0
+  }
+  z
+}
+
+g <- function(x) {
+    1.5
+}
+
+x=linspace(0,1)
+y=f(x)
+plot(x, y, type = "l")
+lines(x, map_dbl(x, g), col = "red")
+z <- acceptationrejet(f,1000,0,1,1.5)
+hist(x)
+
+# ================ The previous function clearly doesnt work =============#
+# Here is an actual proper density using ggplot2 and rquad to simulate random
+# variables from the quadratic density function f(x) = 6x(1 - x)
+f_quad <- function(x) {
+    6 * x * (1 - x) * (x >= 0 & x <= 1)
+}
+
+# tikzDevice::tikz(file = "./rquad_sim.tex", width = 5, height = 3)
+
+x <- rquad(1e5)
+tibble(x) |> ggplot(aes(x)) +
+    geom_histogram(aes(y = stat(density)), fill = "#5087C1") +
+    geom_function(fun = f_quad, size = 1.) +
+    labs(y = "fréquence", title = "Simulation d'une loi quadratique", subtitle = "Densité f(x) = 6x(1 - x), n = 10,000")
+
+ggsave("rquad_sim.png")
+
+# dev.off()
 
 n <- 1e3
 x_std <- rnorm_acc_std(n)
