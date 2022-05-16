@@ -48,8 +48,6 @@
 
 \tableofcontents
 
-\newpage
-
 \section{Introduction}
 
 L’objectif principal de ce projet est d’étudier et d’implémenter une procédure permettant de générer des simulations conditionnelles de processus gaussiens à l’aide de la méthode spectrale et du krigeage. Nous procéderons pour cela pas à pas.
@@ -252,12 +250,11 @@ Comme la moyenne d'une loi uniforme est $\frac{b - a}{2} = \frac{1 - 0}{2} = 0.5
 d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.2886751$, ce qui est proche de notre $s = 0.2877586$.
 
 
-\subsection{Simulation de différentes lois}
+\section{Simulation de différentes lois}
 
+Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Les algorithmes seront tous contruits à partir de runif.
 
-Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Dans la prochaine partie, nous allons implémenter la méthode de transformation inversée, pour simuler une loi exponentielle. Ensuite nous verrons la méthode d'acceptation-rejet pour simuler une loi normale, et finalement la méthode de Box-Muller. Tous ces  algorithmes sont contruits à partir de runif, fonction de R qui distribue une variable aléatoire uniforme.
-
-\subsection{Méthode de transformation inversée}
+\section{Méthode de transformation inversée}
 
 La méthode de transformation inversée consiste à échantillonner une variable aléatoire $X \sim \mathcal{U}(0, 1)$ et à utiliser l'expression analytique
 de la fonction de répartition d'une loi cible. Comme la fonction de répartition $F(x$) est une fonction croissante définie sur $\mathbb{R}^n$ à valeurs dans
@@ -295,24 +292,17 @@ L'implémentation en R ne prend qu'une seule ligne:
     }
 \end{lstlisting}
 
+\section{Methode d'acceptation-rejet}
 
-
-%%% PREUVE
-
-
-
-
-\section{Méthode d'acceptation-rejet}
-
-Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet.
+Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet. 
 
 Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur le compact [0, 1] .
 
-Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis sous la courbe de $g(x)$. Supposons que l'on souhaite générer 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points.
+Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis sous la courbe de $g(x)$. Supposons que l'on souhaite générer 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points. 
 
-Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement l'abscisse de ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces valeurs, les abscisses des points acceptés donc, seront bien distribuées selon la loi $f(x)$.
+Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces points seront bien distribués selon la loi $f(x)$.
 
-\newpage
+
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\linewidth]{media/graph_acceptation_rejet.png}
@@ -320,77 +310,16 @@ Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui repr�
 \caption{app shiny pour faire la simulation}
 \end{figure}
 
-Sur ce graphique, on voit que les points en rouge se situant au-dessus de $f(x)$ seront rejetés tandis que les points blancs se situant en-dessous de la courbe seront acceptés.
-
-On peut facilement implémenter l'algorithme d'acceptation-rejet pour une loi quadratique suivant la densité $f(x) = 6x(1 - x)$ sur $[0, 1]$ sous R :
-\begin{lstlisting}[language=R]
-    rquad <- function(n) {
-
-        ind <- function(x) { 0 <= x & x <= 1 } # x \in [0, 1]
-        # Uniform density between (0, 1)
-        f <- function(x) {
-            6 * x * (1 - x) * ind(x)
-        }
-
-        g <- function(x) {
-            1 * ind(x)
-        }
-
-        c <- 1.5
-        out <- rep(0, n)
-
-        for (i in seq_len(n)) {
-
-            reject <- TRUE
-            z <- 0
-
-            while (reject) {
-
-                y <- runif(1)
-                u <- runif(1)
-
-                reject <- u > (f(y) / (c * g(y)))
-                z <- y
-            }
-
-            out[[i]] <- z
-        }
-
-        out
-    }
-\end{lstlisting}
-
-On simule alors $n = 10,000$ simulations avec \texttt{rquad(1e5)} pour vérifier si notre algorithm produit bien une variable aléatoire dont la densité
-$f(x) = 6x(1 - x)$ :
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.6\textwidth]{media/rquad_sim.png}
-    \caption{10,000 réalisations d'une variable aléatoire dont la densité est une fonction quadratique. On a vérifié graphiquement que la méthode d'acceptation-rejet implémenté en \texttt{rquad}
-    permet de simuler une variable aléotoire avec $f(x) = 6x(1 - x)$.}
-\end{figure}
-
+Sur ce graphique, on voit que les points en rouge se situant au-dessus de $f(x)$ seront rejetés tandis que les points blancs se situant en-dessous de la courbe seront acceptés. 
 
 \subsection{Loi normale}
 
-On peut aussi appliquer la méthode d'acceptation-rejet pour simuler la loi normale. Pour rappel, la loi normale a la fonction de densité suivante :
-$$f_X(x) = \frac{1}{\sigma \sqrt{2\pi}}\exp-\frac{1}{2}(\frac {x-\mu}{\sigma})^2$$
+Cette méthode est très utilisée pour simuler la loi normale. Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
+Alors, nous majorons la fonction densité $f(x)$ en rouge de la loi normale par $g(x)$, la densité de la loi "double exponentielle" en vert qui correspond à une variable exponentielle exp(1) affectée d'un signe + ou -, tiré avec probabilité 0.5.
 
-Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
-
-Alors, nous majorons la fonction densité $f_X(x)$ en rouge de la loi normale par 
-$$g(x) = \left\{
-    \begin{array}{ll}
-        -\lambda\exp-\lambda x & \mbox{si } x \le 0 \\
-        \lambda\exp-\lambda x & \mbox{sinon.}
-    \end{array}
-\right. $$
-la densité de la loi "double exponentielle" en vert qui correspond à une variable exponentielle exp(1) affectée d'un signe positif ou négatif, tiré avec probabilité égale : 0.5.
+Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f(x)$.
 
 
-Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f_X(x)$.
-
-\newpage
 
 \begin{figure}[h!]
 \centering
@@ -398,144 +327,21 @@ Grâce à la méthode d'inversion, nous savons simuler des réalisations selon l
 \caption{Fonctions densités}
 \end{figure}
 
-On remarque que la fonction majorante en verte est extrêment serré autour de la fonction gaussienne que l'on souhaite à simuler. Plus la différence entre $f_X(x)$ et $g(x)$ est importante, plus le nombre
-d'itérations qu'il faut pour accepter une valeur est grand. Cela est évident quand on considère que la probabilité d'accepter une valeur proposée est $\frac{f_X(x)}{cg(x)}$. Quand $f_X(x)$ est près de $cg(x)$,
-la probabilité d'être accepté est presque 1.
 
-
-
-
-
-
-
-
-On peut  implémenter l'algorithme d'acceptation-rejet pour une loi normale centrée réduite sous R :
-\begin{lstlisting}[language=R]
-
- rnorm_acc_std <- function(n) {
-
-    x <- vector("numeric", n)
-
-    for (i in 1:n) {
-
-        reject <- TRUE
-        z <- 0
-
-        while (reject) {
-
-            y1 <- rexp(1)
-            y2 <- rexp(1)
-
-            reject <- y2 < ((y1 - 1) * (y1 - 1) / 2)
-
-            z <- abs(y1)
-        }
-
-        if (runif(1) < 0.5) { z <- -z }
-        x[[i]] <- z
-    }
-
-    x
-
-}
-
-\end{lstlisting}
-
-
-
-
-
-
-
-
-
-
-
- Par ailleurs, on peut quantifier le nombre d'itérations qu'il faut pour simuler $n$ variables aléatoirement suivant une loi normale centrée réduite.
+\newpage
 
 \begin{figure}[h!]
-    \centering
-    \include{plots/avg_count_acc_rej.tex}
-    \caption{Moyenne des rejets}
+\centering
+\include{plots/avg_count_acc_rej.tex}
+\caption{}
 \end{figure}
-%%wtf comment on change le titre
-
-
-La pente de cette courbe représente le pourcentage de variables simulées totales sur le nombre de variable acceptées. Ce pourcentage vaut environ 1,35 c'est-à-dire que pour simuler 100 variables, il faudra en moyenne en tirer 135 en tout. Ce chiffre est spécifique au coeficient que nous avons choisi pour la fonction majorante $g(x)$
-
-%% on pourrait mettre 1 comme coef devant g(x) au lieu de sqrt(1/2e) et montrez que la pente est grave supérieure
-
-
-\subsection{Box-Muller}
-
-La loi normale n’a pas une densité à support compact et on ne connaît pas d’expression simple de l’inverse de sa
-fonction de répartition. On ne peut donc, théoriquement, employer la méthode de transformation inversée. On présente
-ici une méthode qui permet de simuler un couple des variables aléatoires normales, centrées, réduites et indépendantes.
-On veut simuler $X \sim \mathcal{N} (0, 1)$ et $Y \sim \mathcal{N} (0, 1)$ indépendantes. On connaît la densité jointe de $X$ et
- $Y$ :
-
-$$f_X,_Y(x,y) = \frac{1}{2\pi}\exp(-\frac {x^2+y^2}{2})$$
-
-On effectue le passage en coordonnées polaires
-
-$$x = \rho \cos(\theta), y = \rho \sin(\theta)$$
-
-et on obtient
-
-$$f_X,_Y(x,y)dxdy = \frac {1}{2\pi}\exp(-\frac {\rho^2}{2})\rho d\rho d\theta = f_R,_\theta(\rho,\theta)d\rho d\theta$$
-
-Dans la densité jointe des variable $R$ et $\theta$, on reconnaît
-
-$\frac{1}{2\pi} =$ densité de $\theta$ qui suit une loi Uniforme sur 0 et 2 $\pi$.
-
-
-$\rho \exp(-\frac{\rho^2}{2}) = $densité de R.
-
-On en déduit la fonction de répartition de R :
-
-$$F_R(\rho) = 1- exp(-\frac{t^2}{2})$$
-
-On reconnaît une loi exponentielle de paramètres 1/2 pour $R^2$.\\
-On a donc les lois de $R$ et  $\theta$ :
-
-$$R^2 ~ \exp(\frac{1}{2}), \theta ~ U([0, 2\pi])$$
-
-La méthode consiste donc à tirer deux variables uniforme $U_1$ et $U_2$, puis on insère ces deux variables dans les formule suivante: \\
-
-$$R = \sqrt[1/2]{-2 \ln U_1}$$
-
-$$\theta = 2\pi U_2$$
-
-et on pose :
-
-$$X = R\cos\theta, \\
-Y = R\sin\theta$$
-
-Ces deux variables aléatoires sont indépendantes par construction leur densité jointe est définie comme le produit de leurs densités respectives .
-
-Remarque : Pour simuler $Z \sim N (\mu, \sigma^2 ),$ on simule $X \sim N (0, 1)$ et on effectue la transformation:
-
- $$Z = \mu + \sigma X$$
-
-
-
-
 
 \section{Simulation géostatistique}
 
 \subsection{Motivation}
 
-Le monde de simulation classique opère sous l'hypothèse d'indépendance des réalisations successives. C'est-à-dire que le prochain
-valeur échantillonné n'a aucun rapport avec la valeur précédente. Si on considere qu'une région par exemple d'une montaigne où le terrain
-dans un rectangle 2 dimensionnel a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude son aléotoire, mais dans un
-certain sens leurs quantités sont liées géographiquement. Il existe une structure spatiale sur la région.
 
-La simulation géostatistique plusiers nouveaux conceptes inédit dans la simulation classique. Une idée intégrale de l'étude des processus
-stochastique spatiale c'est que la configuration des altitudes est considerée une variable régionalisée, ce qui veut dire qu'une certain terrain
-est une réalisations d'une fonction aléatoire. Comme l'angle d'etude est fondamentalement différent que la simulation classique, on doit approcher la simulation
-différamment.
-
-
+Le monde de simulation classique opère sous l'hypothèse d'indépendance des réalisations successives.
 
 \section{R shiny}
 
@@ -550,13 +356,13 @@ Aléatoires simulés.
 \centering
 \includegraphics[width=\linewidth]{media/apppic1.png}
 \vspace{-5cm}
-\caption{1,000 réalisations d'une variable aléatoire normale avec espérance 0 et variance 1}
+\caption{app shiny pour faire la simulation}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\linewidth]{media/rshiny_gauss.png}
-\caption{Simulaton d'une loi gaussienne bivarié avec Cov$(X, Y) = 0.6$ et Var$(X)$ = Var$(Y) = 1$.}
+\includegraphics[height=8cm]{media/apppic2.png}
+\caption{choix de distributions}
 \end{figure}
 
 \section{Conclusion}
