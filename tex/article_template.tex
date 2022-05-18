@@ -255,7 +255,7 @@ d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.28
 \subsection{Simulation de différentes lois}
 
 
-Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Les algorithmes seront tous contruits à partir de runif.
+Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Dans la prochaine partie, nous allons implémenter la méthode de transformation inversée, pour simuler une loi exponentielle. Ensuite nous verrons la méthode d'acceptation-rejet pour simuler une loi normale, et finalement la méthode de Box-Muller. Tous ces  algorithmes sont contruits à partir de runif, fonction de R qui distribue une variable aléatoire uniforme.
 
 \subsection{Méthode de transformation inversée}
 
@@ -295,7 +295,14 @@ L'implémentation en R ne prend qu'une seule ligne:
     }
 \end{lstlisting}
 
-\section{Methode d'acceptation-rejet}
+
+
+%%% PREUVE
+
+
+
+
+\section{Méthode d'acceptation-rejet}
 
 Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet.
 
@@ -303,7 +310,7 @@ Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité
 
 Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis sous la courbe de $g(x)$. Supposons que l'on souhaite générer 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points.
 
-Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces points seront bien distribués selon la loi $f(x)$.
+Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement l'abscisse de ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces valeurs, les abscisses des points acceptés donc, seront bien distribuées selon la loi $f(x)$.
 
 \newpage
 \begin{figure}[h!]
@@ -366,10 +373,22 @@ $f(x) = 6x(1 - x)$ :
 
 \subsection{Loi normale}
 
-On peut aussi appliquer la méthode d'acceptation-rejet pour simuler la loi normale. Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
-Alors, nous majorons la fonction densité $f(x)$ en rouge de la loi normale par $g(x)$, la densité de la loi "double exponentielle" en vert qui correspond à une variable exponentielle exp(1) affectée d'un signe + ou -, tiré avec probabilité 0.5.
+On peut aussi appliquer la méthode d'acceptation-rejet pour simuler la loi normale. Pour rappel, la loi normale a la fonction de densité suivante :
+$$f_X(x) = \frac{1}{\sigma \sqrt{2\pi}}\exp-\frac{1}{2}(\frac {x-\mu}{\sigma})^2$$
 
-Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f(x)$.
+Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
+
+Alors, nous majorons la fonction densité $f_X(x)$ en rouge de la loi normale par 
+$$g(x) = \left\{
+    \begin{array}{ll}
+        -\lambda\exp-\lambda x & \mbox{si } x \le 0 \\
+        \lambda\exp-\lambda x & \mbox{sinon.}
+    \end{array}
+\right. $$
+la densité de la loi "double exponentielle" en vert qui correspond à une variable exponentielle exp(1) affectée d'un signe positif ou négatif, tiré avec probabilité égale : 0.5.
+
+
+Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f_X(x)$.
 
 \newpage
 
@@ -379,15 +398,72 @@ Grâce à la méthode d'inversion, nous savons simuler des réalisations selon l
 \caption{Fonctions densités}
 \end{figure}
 
-On remarque que la fonction majorante en verte est extrêment serré autour de la fonction gaussienne que l'on souhaite à simuler. Plus la différence entre $f(x)$ et $g(x)$, plus le nombre
-d'itérations qu'il faut pour accepter une valeur. Cela est évident quand on considère que la probabilité d'accepter une valeur proposée est $\frac{f(x)}{cg(x)}$. Quand $f(x)$ est près de $cg(x)$,
-la probabilité d'être accepté est preque 1. Effectivement, on peut quantifier le nombre d'itérations qu'il faut pour simuler $n$ variables aléatoirement suivant une loi normale centrée réduite.
+On remarque que la fonction majorante en verte est extrêment serré autour de la fonction gaussienne que l'on souhaite à simuler. Plus la différence entre $f_X(x)$ et $g(x)$ est importante, plus le nombre
+d'itérations qu'il faut pour accepter une valeur est grand. Cela est évident quand on considère que la probabilité d'accepter une valeur proposée est $\frac{f_X(x)}{cg(x)}$. Quand $f_X(x)$ est près de $cg(x)$,
+la probabilité d'être accepté est presque 1.
+
+
+
+
+
+
+
+
+On peut  implémenter l'algorithme d'acceptation-rejet pour une loi normale centrée réduite sous R :
+\begin{lstlisting}[language=R]
+
+ rnorm_acc_std <- function(n) {
+
+    x <- vector("numeric", n)
+
+    for (i in 1:n) {
+
+        reject <- TRUE
+        z <- 0
+
+        while (reject) {
+
+            y1 <- rexp(1)
+            y2 <- rexp(1)
+
+            reject <- y2 < ((y1 - 1) * (y1 - 1) / 2)
+
+            z <- abs(y1)
+        }
+
+        if (runif(1) < 0.5) { z <- -z }
+        x[[i]] <- z
+    }
+
+    x
+
+}
+
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
+ Par ailleurs, on peut quantifier le nombre d'itérations qu'il faut pour simuler $n$ variables aléatoirement suivant une loi normale centrée réduite.
 
 \begin{figure}[h!]
     \centering
     \include{plots/avg_count_acc_rej.tex}
-    \caption{}
+    \caption{Moyenne des rejets}
 \end{figure}
+%%wtf comment on change le titre
+
+
+La pente de cette courbe représente le pourcentage de variables simulées totales sur le nombre de variable acceptées. Ce pourcentage vaut environ 1,35 c'est-à-dire que pour simuler 100 variables, il faudra en moyenne en tirer 135 en tout. Ce chiffre est spécifique au coeficient que nous avons choisi pour la fonction majorante $g(x)$
+
+%% on pourrait mettre 1 comme coef devant g(x) au lieu de sqrt(1/2e) et montrez que la pente est grave supérieure
 
 
 \subsection{Box-Muller}
@@ -485,68 +561,16 @@ Aléatoires simulés.
 
 \section{Conclusion}
 
-Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant
-uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes
- d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation
- mutlivariée et en spatial. Pour cela nous avons utilisé les méthode de de krigeage et éventuellement
- nous allons voir si nous pouvons implémenter la méthode spectrale pour simuler des processus gaussiens
+Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation mutlivariée et en spatial. 
+%%Pour cela nous avons utilisé les méthode de 
 
-\section{Ce que nous pourrions amélirorer}
-\subsection{Vitesse}
-
-Les boucles en R sont péniblement lentes comparé aux autre languages compilés comme le C. Donc, la plupart de nos algorithmes implémentés sont
-centaines des fois plus lentes que les fonctions de base en R telles que \texttt{runif}, \texttt{rexp}, etc. Si on avait plus de temps,
-on aurait aimé implémenter les fonctions en C en utilisant le package Rcpp qui permet d'écrire notre propre code en C/C++ à executer sous R.
-\section{Réflexions}
-
-\renewcommand {\epigraphflush} {flushleft}
-\epigraph{Ce projet d'initiation a été une véritable découverte pour moi, puisque j'ai appris à
- utiliser de nouveaux langages de programmation, R et Rshiny. De plus, j'ai découvert la
-  simulation de variables aléatoires multivariées qui sont utiles
-lorsque l'on veut simuler certains phénomènes physiques.} {\textit{Samson}}
-
-\epigraph{J'ai acquis de nombreuse compétence en informatique grâce à ce projet. J'ai appris à utiliser Github en projet,
-le logiciel R et Rshiny. J'ai compris les notions d'aléatoire et pseudo-aléatoire.}
- {\textit{Pauline}}
-
-\epigraph{J'ai approfindi mes connaissances autour la génération des variables aléatoires qui est indispensable dans le domaine
-de processus stochastique ou des nombreuses phenomènes phsyiques sont modélisé par des fonctions aléatoires. J'ai eu ma première rencontre
-avec la simulation conditionnelle et j'ai pu découvrir des nouveaux outils mathématiques utilisés en géostatistique tel que le variogram, la méthode spectrale,
-et le krigeage.}
- {\textit{Evan}}
+Il y a plusieurs choses que nous aurions pu amélorier au cours du projet.
+Tout d'abord, les boucles en R sont plutôt lentes. Pour la suite, nous aurions pu implémenter les fonctions en C en utilisant le package Rcpp. Pour suivre, nous aurions tenter d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
+de modifier l'état du générateur en même temps.
 
 
-\begin{thebibliography}{9}
-\bibitem{coursgeo}
-Yann Méneroux (2018), \emph{Introduction à la Géostatistique}, Institut National de l'Information Géographique et Forestièr
-\bibitem{texbook}
-Donald E. Knuth (1986) \emph{The \TeX{} Book}, Addison-Wesley Professional.
+Ce projet d'initiation a été une véritable découverte pour nous, puisque on a appris à utiliser de nouveaux langages de programmation, R et Rshiny. De plus, on a découvert la simulation de variables aléatoires multivariées qui sont utiles lorsque l'on veut simuler certains phénomènes physiques.
 
-\bibitem{acc rej}
-Karl Sigman (2007), \emph{Acceptance-Rejection Method}
-
-\bibitem{inv transform}
-Karl Sigman (2010), \emph{Inverse Transform Method}
-
-\bibitem{krig}
-Eric Marcon (2021), \emph{Krigeage avec R}
-
-\bibitem{handbook}
-Dikr P. Kroese (2011), Thomas Taimre, and Zdravko I. Botev, \emph{Handbook of Monte Carlo Methods}, Wiley series in Probability and Statistics
-
-\bibitem{variate generation}
-Luc Devroye (1986), \emph{Non-Uniform Random Variate Generation}, Springer Science
-
-\bibitem{geo sim}
-Christian Lantuéjoul (2002), \emph{Geostatistical Simulation}, Springer
-
-\bibitem{mont methods}
-Christian P. Robert, George Casella (1999), \emph{Monte Carlo Statistical Methods Second Edition}, Springer Texts in Statistics
-
-\bibitem{geostat}
-Jean-Paul Chilès, Pierre Delfiner (2012), \emph{Geostatistics Modeling Spatial Uncertainty}, Wiley series in Probability and Statistics
-
-\end{thebibliography}
 
 
 \end{document}
