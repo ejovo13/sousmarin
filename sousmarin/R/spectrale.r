@@ -15,4 +15,4 @@ f_omega <- function(w, a = 1, d = 1) {
 }
 
 # Package sur GitHub
-devtools::install_github("EricMarcon/SpatDiv")
+# devtools::install_github("EricMarcon/SpatDiv")
