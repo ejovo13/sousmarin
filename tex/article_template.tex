@@ -390,7 +390,7 @@ $$f_X(x) = \frac{1}{\sigma \sqrt{2\pi}}\exp-\frac{1}{2}(\frac {x-\mu}{\sigma})^2
 
 Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
 
-Alors, nous majorons la fonction densité $f_X(x)$ en rouge de la loi normale par 
+Alors, nous majorons la fonction densité $f_X(x)$ en rouge de la loi normale par
 $$g(x) = \left\{
     \begin{array}{ll}
         -\lambda\exp-\lambda x & \mbox{si } x \le 0 \\
@@ -542,12 +542,113 @@ valeur échantillonné n'a aucun rapport avec la valeur précédente. Si on cons
 dans un rectangle 2 dimensionnel a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude son aléotoire, mais dans un
 certain sens leurs quantités sont liées géographiquement. Il existe une structure spatiale sur la région.
 
-La simulation géostatistique plusiers nouveaux conceptes inédit dans la simulation classique. Une idée intégrale de l'étude des processus
-stochastique spatiale c'est que la configuration des altitudes est considerée une variable régionalisée, ce qui veut dire qu'une certain terrain
+La simulation géostatistique présente plusiers nouveaux conceptes inédits dans la simulation classique. Une idée intégrale de l'étude des processus
+stochastique spatiale c'est que la valeur observée est considerée une variable régionalisée, ce qui veut dire qu'une certain terrain
 est une réalisations d'une fonction aléatoire. Comme l'angle d'etude est fondamentalement différent que la simulation classique, on doit approcher la simulation
 différamment.
 
+\subsection{Cadre d'étude}
+Dans cette section nous allons vous introduire quelques nouveaux objets mathématiques qui sont souvent utilisés dans le domaine
+de géostatistique. Il s'agira principalement d'un \textbf{processus stochastique} $Z$, une \textbf{fonction de covariance} $C(h)$, et une \textbf{domaine $\mathcal{D}$} sur laquelle
+on peut avoir des observations.
 
+\begin{definition}[Processus stochastique]
+    Soit $(\Omega, \mathcal{A}, \mathbb{P})$ un espace probabilisé, et $\mathcal{D}$ un espace quelconque. On appelle
+    \textbf{processus stochastique} toute fonction Z :
+    $$ Z : \mathcal{D} \times \Omega \to \mathbb{R} $$
+\end{definition}
+
+On aimerait utiliser cette définition pour modéliser la configuration spatiale d'un câble sous-marin en tant qu'une réalisation d'un processus stochastique.
+Dans ce cas, on peut imaginer qu'à chaque endroit du câble il y a une profondeur associé. Par exemple, à 100m le câble pourrait avoir une profondeur de 3.7km. On peut donc
+considérer que la configuration spatiale d'un câble sous-marin est une fonction aléatoire qui, pour une éventualité $\omega \in \Omega$ donnée, associe à chaque position
+$s \in \mathcal{D} = \mathbb{R}$ une profondeur $Z(s) \in \mathbb{R}$. Un autre exemple d'un processus stochastique pourrait être la quantité de précipitation sur l'année dans une région fixe. Dans ce cas-là, on prendra $\mathcal{D} = \mathbb{R}^2$.
+
+\subsubsection{Stationnarité}
+
+Une idée qui est super important dans l'étude des fonctions aléatoires spatiales est l'idée de la stationnarité. Grosso modo, la stationnarité est le concepte que pour un processus stochastique,
+il existe des propriétés qui sont invariants au déplacements dans l'espace. Souvent classifiés sur le principe des \textit{moments statistiques}, la stationnarité nous permet de simplifier nos modèles mathématiqes des
+phenomènes réelles.
+
+\begin{definition}[Stationnarité à l'ordre 1]
+    Un processus stochastique est qualifié de \textbf{stationnaire à l'ordre 1} si et seulement si le premier moment existe et est invariant par translation $h \in D$ :
+    $$ \mathbb{E}[Z(x)] = \mathbb{E}[Z(x + h)]$$.
+\end{definition}
+
+En effet, cela nous dit qu'un processus stochastique $Z$ stationnaire à l'ordre 1 a un premier moment qui existe (traduction: si $\mathbb{E}[Z(x)] < +\infty$) et que cette espérance
+est le même partout dans l'espace $\mathcal{D}$. Cette condition impose une certaine régularité sous le processus que l'on aimerait modéliser. Au-dela, on pourrait parler de la stationnarité
+à l'ordre 2 qui impose une condition sur le deuxième moment de $Z$, la covariance :
+
+\begin{definition}[Stationnarité à l'ordre 2]
+    Un processus stochastique est qualifié de \textbf{stationnaire à l'ordre 2} si et seulement si la deuxième moment existe et est invariant par translation $h \in D$ :
+    $$ \mathrm{Cov}[Z(x_1), Z(x_2)] = \mathrm{Cov}[Z(x_1 + h, x_2 + h)]$$.
+\end{definition}
+
+Une conséquence importante de cette hypothèse cést que la covariance d'un processus stationnaire à l'ordre 2 ne dépend que du vecteur séparant les sites :
+    $$ \mathrm{Cov}[Z(x_1), Z(x_2)] = f(x_1 - x_2) $$
+
+Cette fonction $f(x_1 - h_2)$ est souvent écrite sous la forme $C(h)$, où $h \in \mathcal{D}$ est le vecteur séparant les sites. Un modèle très souvent appliqué dans la géostatistique est la modèle exponentielle isotropique
+$$ C(h) = e^{\frac{-|h|}{a}} $$
+
+où isotropique veut dire que $C(h)$ dépend suelement sur la distance $|h|$ et pas la direction, et $a$ est un paramètre qui détermine comment la covariance diminue pour des sites lointaines.
+
+Pour éviter de trop se perdre dans la théorie, nous nous lan\c cons dans la simulation pour relier le monde des processus stochastique classique et spatiale.
+
+\subsection{Simulation spatiale}
+
+Dans ce premier exemple, on souhaite illustrer la simulation spatiale en unifiant le monde spatialece avec ce que nous avons déjà vu précedamment pour la simulation,
+spécifiquement avec le vecteur gaussien. Pour rappel, pour simuler une loi gaussienne multivariée, il faut l'espérance $\vec\mu$ et la matric de covariance $\Sigma$,
+ce que est le vecteur analogue de $\mu$ et $\sigma^2$ qui décrit une loi normale en une dimension.
+
+On voudrait simuler une réalisation de la variable régionalisé $Z(s), s_i \in \mathcal{D}$, $\mathcal{D} \in \mathbb{R}^2$.
+On va donc prendre une discretization de l'espace en un grille de $n \times n$ où les coordonnées
+$(i, j) \in \mathbb{R}^2$ de $s_i \in D, i \in [|1, n^2|]$ est son indice dans une matrice carrée de $n$ lignes et $n$
+colonnes remplie par les valeurs $i \in [|1, n^2|]$ par \textbf{ligne dominante}. Pour $n = 3$, il s'agit de la matrice suivant :
+$$
+    \begin{pmatrix}
+        s_1 & s_2 & s_3 \\
+        s_4 & s_5 & s_6 \\
+        s_6 & s_8 & s_9
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        1 & 2 & 3 \\
+        4 & 5 & 6 \\
+        6 & 8 & 9
+    \end{pmatrix}
+$$
+Les coordonnées \texttt{coord($s$)} sont alors
+
+$$
+    \texttt{coord}
+    \begin{pmatrix}
+        s_1 & s_2 & s_3 \\
+        s_4 & s_5 & s_6 \\
+        s_6 & s_8 & s_9
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        (1, 1) & (1, 2) & (1, 3) \\
+        (2, 1) & (2, 2) &(2, 3) \\
+        (3, 1) & (3, 2) & (3, 3)
+    \end{pmatrix}
+$$
+
+et on prend une fonction de distance induite par la norme euclidienne :
+$$ d(s_i, s_j) = || \texttt{coord}(s_i) - \texttt{coord}(s_j)||_2 $$
+
+Par exemple, $d(s1, s5) = ||(1, 1) - (2, 2)||_2 = \sqrt{2}$.
+
+Maintenants, on est muni avec une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste qu'à faire des hypothèse sur une fonction
+aléatoire sur $\mathcal{D}$ si on voudrait simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, on suppose que $Z$ est un
+processus stationnaire à l'ordre 2. De plus, on suppose que la covariance de $Z$ suit une modèle exponentielle
+$$ C(h) = e^{\frac{-|h|}{a}}. $$
+Comme on a une fonction de distance, on prend $h$ = $d(s_i, s_j)$. C'est maintenant où on relie les des côtés de simulation : On suppose que
+la valeur de la variable régionalisé est un vecteur gaussien avec espérance $\vec \mu$ et matrice de covariance $\Sigma$. Si on prend $\vec\mu = \textbf{0}$ il ne resete
+qu'à déterminer une matrice de covariance. C'est ici où on utilise la structure spatiale de notre grille et les distances entre eux pour computer une matrice
+de covariance et simuler un vecteur gaussien en utilisant la méthode de cholesky.
+
+Le fait qu'on suppose que $Z$ est stationnaire à l'ordre 2 (au premier moment aussi) nous permet d'avoir une covariance à partir d'une distance. On prend un moment pour vous illustrer
+quelques simulations de ce sort avant de détailler la méthodologie au niveau algorithmique.
 
 \section{R shiny}
 
@@ -573,8 +674,8 @@ Aléatoires simulés.
 
 \section{Conclusion}
 
-Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation mutlivariée et en spatial. 
-%%Pour cela nous avons utilisé les méthode de 
+Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation mutlivariée et en spatial.
+%%Pour cela nous avons utilisé les méthode de
 
 Il y a plusieurs choses que nous aurions pu amélorier au cours du projet.
 Tout d'abord, les boucles en R sont plutôt lentes. Pour la suite, nous aurions pu implémenter les fonctions en C en utilisant le package Rcpp. Pour suivre, nous aurions tenter d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
