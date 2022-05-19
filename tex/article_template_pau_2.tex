@@ -1,0 +1,588 @@
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[10pt]{article} % use larger type; default would be 10pt
+
+\input{preamble.tex}
+
+\title{Simulation conditionnelle d’un processus gaussien}
+\author{NEEL Pauline, PETROS Russom Samson, RAKOTOVAO Jonathan, VOYLES Evan}
+\date{19 Mai 2022}
+
+
+\begin{document}
+
+
+\begin{titlepage}
+
+\maketitle
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics{media/plot.png}
+\end{figure}
+
+\vspace{3cm}
+
+% \begin{figure}[h!]
+%     \centering
+%     \includegraphics[width=0.25\linewidth]{media/1280px-Logo_Polytech_Sorbonne.png}
+% \end{figure}
+
+% \begin{abstract}
+% Abstract.
+
+% \end{abstract}
+
+% \renewcommand {\epigraphflush} {center}
+
+\epigraph{Any one who considers arithmetical methods of producing random digits is, of course, in a state of sin}
+ {\textit{John von Neumann}}
+
+\newpage
+
+\end{titlepage}
+
+\pagestyle{fancy}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+L’objectif principal de ce projet est d’étudier et d’implémenter une procédure permettant de générer des simulations conditionnelles de processus gaussiens à l’aide de la méthode spectrale et du krigeage. Nous procéderons pour cela pas à pas.
+
+La première étape sera d’abord d’appréhender ce qu’est un algorithme de simulation et de comprendre comment cela fonctionne. Nous commencerons donc ce projet par une question simple : comment générer des réalisations d’une variable aléatoire normale (cadre univarié). Pour y répondre, nous allons s’intéresser à la méthode d’acceptation-rejet ainsi qu’à la méthode de Box-Muller.
+
+On se placera ensuite dans un cadre multivarié : nous utiliserons la décomposition de Cholesky de la matrice de variance-covariance afin de générer des réalisations d’un vecteur gaussien. Enfin, dans un cadre spatial, nous simulerons des processus gaussiens grâce à la méthode spectrale, puis conditionnerons les simulations obtenues à l’aide du krigeage. L’implémentation des différents algorithmes se fera sous R.
+
+De plus, en utilisant Rshiny nous coderons une application web qui permettra à des utilisateurs de générer puis de visualiser des réalisations de variables aléatoires, vecteurs ou processus gaussiens.
+
+
+\section{Simulation classique}
+\subsection{Génération de variables aléatoires}
+
+
+Un ordinateur n'est qu'un gros agencement complexe de circuits. Régnées par les lois physiques, les opérations provenant du mouvement des électrons
+sont encodées par les fonctions booléennes. Les \textit{fonctions} - dans le sens mathématique - sont des objets purement déterministes. Autrement dit,
+une fonction associe à une donnée d'entrée, une unique valeur dans l'espace d'arrivée.
+
+Si on lui donne plusieurs fois la même valeur, par exemple $x_1$ et $x_2$
+telles que $x_1 = x_2$, la définition d'une fonction implique que $f(x_1) = f(x_2)$. D'où vient l'énigme : Comment générer des variables aléatoires alors que nous
+disposons seulement de méthodes déterministes?
+% \setlength \epigraphwidth {\linewidth}
+
+Nous ne pouvons pas à répondre à cette question plus éloquemment que le fait John von Neumann, l'un des meilleurs mathématiciens, pionniers, informaticiens de tous les temps; générer des variables aléatoires sur un ordinateur est tout simplement impossible.
+Cependant, cela ne nous empêchera pas d'essayer quand même. Il s'agira de produire des variables dites pseudo-aléatoires.
+
+\subsection{Loi uniforme}
+
+On commence notre projet en étudiant la loi la plus simple parmi les lois usuelles - la loi uniforme. Tout d'abord, parce qu'elle est simple, mais la loi uniforme va également nous permettre de construire des algorithmes plus complexes, notamment la méthode de la transformée inverse ou la méthode de rejet. Ainsi, cela nous permettra de simuler différentes lois, comme la loi normale, la loi exponentielle, etc.
+
+Il s'agira principalement d'échantillonner une variable $X\sim \mathcal{U}(0, 1)$ puis ensuite d'effectuer des manipulations mathématiques pour produire une variable suivant une autre loi ciblée.
+
+Alors sans plus tarder, on formalise nos objectifs. Le principe est le suivant: nous allons générer une suite $(x_n$) à partir d'une graine $x_0$ et une fonction $f : \mathbb{R} \longrightarrow \mathbb{R}$ telles que
+$$
+\left\{
+    \begin{array}{ll}
+        x_{0} \in \mathbb{R} \\
+        x_{n} = f(x_{n - 1})  \quad \forall n \in \mathbb{N} \\
+    \end{array}
+\right.
+$$
+
+On souhaite trouver une fonction qui vérifie certaines qualités désirées. Par exemple, on veut que notre fonction ait une période suffisamment longue. En effet, nous savons qu'elle sera périodique, il est donc importante que sa période soit très grande pour pas qu'un schéma soit visible.
+
+On souhaite également qu'elle
+produise des valeurs uniformément réparties sur un intervalle. Etudions la fonction $x \mapsto (x + 1) \mathbin{\%} 2$, où \% est l'opération de modulos et on fixe une graine $x_0 = 1$.
+\begin{align*}
+    f(x_0) &= (1 + 1) \mathbin{\%} 2 = 2 \mathbin{\%} 2 = 0 \\
+    f(x_1) &= (0 + 1) \mathbin{\%} 2 = 1 \mathbin{\%} 2 = 1 \\
+    f(x_2) &= (1 + 1) = 0
+\end{align*}
+Cette fonction produit alors la suite
+\begin{equation*}
+    \{1, 0, 1, 0, 1, 0, 1, 0, ...\}
+\end{equation*}
+dont la période est 2 et évidemment dont les valeurs ne sont pas aussi variées qu'on le souhaite. Nous verrons plus précisement ce que
+``suffisamment variés'' veut dire. Pour l'instant, on se contente de dire que cette suite-là n'atteint pas nos attentes.
+
+Heureusement pour nous, il existe de nombreuses fonctions
+qui remplissent nos critères recherchés, ce sont des fonctions pseudo-aléatoires, elles sont déterminées mais leurs comportements s'approchent de l'aléatoire.
+
+\subsubsection{Générateur congruentiel linéaire}
+
+La méthode la plus directe à implémenter pour générer une telle suite est un \textit{générateur congruentiel linéaire}. Congruentiel parce qu'il s'agit d'une opération modulo et
+linéaire vu qu'il y a une transformation affine. Dans le cas général, on considère les fonctions de la forme:
+$$
+    f(x; a, c, m) = (ax + c) \bmod m.
+$$
+
+D'ailleurs, la fonction étudiée dans la section précédente est un générateur congruentiel linéaire dont les paramètres sont $a = 1$, $c = 1$, et $m = 2$. Ne vous inquiétez pas, il existe un large panel de
+générateurs congruentiels linéaires (LCG). Les choix des paramètres utilisés par les logiciels connus sont détaillés sur une page Wikipédia et leurs propriétés sont déjà
+bien étudiées. Vu que l'objectif de notre projet est d'approfondir la connaissance autour des méthodes générant des variables (pseudo) aléatoires, on a décidé d'implémenter notre propre LCG hybride.
+Pour $m$, on choisit $2^{31} - 1$, un nombre de Mersenne qui est très connu. Pour $a$, on s'amuse en choisissant $12345678$. Finalement, on affecte à l'incrémenteur $c$ la valeur 1.
+$$
+    f_{sousmarin}(x) = (12345678x + 1) \bmod (2^{31} - 1)
+$$
+
+
+\subsubsection{Implémentation en R}
+Dans ce projet, nous faisons le choix d'implémenter notre propre version de runif afin de comprendre en profondeur la notion d'aléatoire. En effet, toutes les autres lois que nous allons pouvoir simuler, seront constuites à partir de runif. Il était donc important pour nous de faire cette étape. Afin d'implémenter une version de notre fonction en language de programmation R, on doit s'éloigner un peu de la pureté de la théorie et se salir les mains dans le code ! C'est-à-dire que l'on ne va pas garder une valeur $x_0$
+pour toute l'éternité; on aura une variable globale déterminant l'état du générateur qui serait mise à jour quand on veut générer une suite de valeurs.
+
+% \lstset{language=R, caption=somecaption, keywords={smooth}}
+
+\begin{lstlisting}[language =R]
+
+    # Initialiser la graine (une variable globale) a 0
+    g_SEED_SOUSMARIN <- 0
+
+    # similaire a la fonction de R set.seed, mettre a jour
+    # la valeur de g_SEED_SOUSMARIN
+    set_seed <- function(seed) {
+        assign("g_SEED_SOUSMARIN", seed, envir = .GlobalEnv)
+    }
+
+    # La fonction LCG pure qu'on a definie en partie 3
+    f_sousmarin <- function(x) {
+        (12345678 * x + 1) %% (2^31 - 1)
+    }
+
+    # Generer une suite des variables de taille n en mettant a jour l'etat
+    # de la graine a chaque pas.
+    gen_suite <- function(n) {
+
+        suite <- vector("numeric", n) # allouer un vecteur de taille n
+
+        for (i in seq_len(n)) {
+            x_i <- f_sousmarin(g_SEED_SOUSMARIN)
+            suite[[i]] <- x_i
+            set_seed(x_i)
+        }
+
+        suite
+    }
+\end{lstlisting}
+
+On a donc implémenté notre propre LCG, \texttt{f\_sousmarin}. Pour renvoyer une valeur dans l'intervalle ]0, 1[ afin de simuler $X \sim \mathcal{U}(0, 1)$, on remarque que
+la division modulo $m$ renvoie une valeur entre ]0, $m - 1$[. Pour le normaliser, on divise par le facteur $m - 1 \equiv 2^{31} - 2$.
+
+\begin{lstlisting}[language=R]
+
+    r_std_unif <- function(n) {
+
+        suite <- vector("numeric", n)
+
+        for (i in seq_len(n)) {
+            x_i <- f_sousmarin(g_SEED_SOUSMARIN)
+            suite[[i]] <- x_i / (2^31 - 2)
+            set_seed(x_i)
+        }
+
+        suite
+    }
+
+\end{lstlisting}
+
+Si on considère le cas général où l'on souhaiterait générer des variables uniformément réparties dans l'intervalle ]$a$, $b$[, on commence tout d'abord
+par échantillonner $X \sim \mathcal{U}(0, 1)$. Ensuite, on multiplie $X$ par l'écart entre $a$ et $b$, ($b - a$), pour produire une variable $X_{b - a} \in$ ]$0$, $b - a$[. Finalement,
+on décale $X_{b - a}$ en additionnant $a$ pour finir avec la variable aléatoire uniformément répartie dans l'intervalle ]$0 + a, b - a + a$[ $\equiv $ ]$a, b$[. Après cette transformation affine appliquée à
+$X$, nous avons $X_{a,b} \sim \mathcal{U}(a, b)$.
+
+On imite le comportement et la signature de la fonction dans R de base \texttt{runif} avec l'implémentation suivante
+
+\begin{lstlisting}[language=R]
+
+    r_unif <- function(n, min = 0, max = 1) {
+
+        spread <- max - min
+        suite  <- vector("numeric", n)
+
+        for (i in seq_len(n)) {
+            x_i <- f_sousmarin(g_SEED_SOUSMARIN)
+            suite[[i]] <- (x_i * spread) / (2^31 - 2) + min
+            set_seed(x_i)
+        }
+
+        suite
+    }
+
+\end{lstlisting}
+
+
+\subsubsection{Vérification pour la loi uniforme}
+
+Comment vérifier que notre LCG produit des valeurs qui sont véritablement réparties uniformément ? Quand il s'agit de produire
+des milliards d'observations, on ne peut pas facilement vérifier à la main si notre fonction n'a pas de structure évidente (sauf la période qui est mathématiquement inévitable).
+Pourtant, on peut commencer par une exploration visuelle.
+
+Pour ce faire, on utilise la fonction \texttt{r\_std\_unif} définie au-dessus pour générer 1E6 valeurs aléatoires qui sont supposées être uniformément
+réparties sur l'intervalle ]$0, 1$[.
+
+\begin{figure}[h!]
+    \centering
+    \include{plots/uniform_histogram.tex}
+
+    \vspace{-1cm}
+    \caption{Histogramme généré à partir d'un appel à \texttt{r\_std\_unif} avec $n = 1000000$. On initialise la graine de notre
+    générateur avec un appel à \texttt{set\_seed(0)}.}
+
+\end{figure}
+
+On peut aussi facilement vérifier que les statistiques de notre échantillon correspondent bien à celles que l'on attend.
+
+\begin{lstlisting}[language=R]
+    library(sousmarin)
+
+    set_seed(0)
+    x <- r_std_unif(1E6)
+
+    mu  <- mean(x) # 0.5000658
+    sig <- std(x)  # 0.2877586
+\end{lstlisting}
+
+On réitère le simple fait qu'il n'y a \textbf{rien d'aléatoire} avec la génération de ces valeurs et que vous pouvez vérifier leur quantité en
+téléchargeant notre package \textbf{ICI}\footnote{On mettra ici un lien du github (voire un lien de CRAN????) et des instructions pour télécharger notre package}.
+
+On passe à l'analyse. Avec notre échantillon $x$ de taille 1E6, le moyen de l'échantillon $\bar x = 0.50006584$ et l'écart type de l'échantillon est $s = 0.2877586$.
+Comme la moyenne d'une loi uniforme est $\frac{b - a}{2} = \frac{1 - 0}{2} = 0.5$, nous sommes ravis de voir que $\bar x = 0.50006584 \sim 0.5$. Parallèlement, l'écart type
+d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.2886751$, ce qui est proche de notre $s = 0.2877586$.
+
+
+\subsection{Simulation de différentes lois}
+
+
+Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Dans la prochaine partie, nous allons implémenter la méthode de transformation inversée, pour simuler une loi exponentielle. Ensuite nous verrons la méthode d'acceptation-rejet pour simuler une loi normale, et finalement la méthode de Box-Muller. Tous ces  algorithmes sont contruits à partir de runif, fonction de R qui distribue une variable aléatoire uniforme.
+
+\subsection{Méthode de transformation inversée}
+
+La méthode de transformation inversée consiste à échantillonner une variable aléatoire $X \sim \mathcal{U}(0, 1)$ et à utiliser l'expression analytique
+de la fonction de répartition d'une loi cible. Comme la fonction de répartition $F(x$) est une fonction croissante définie sur $\mathbb{R}^n$ à valeurs dans
+$[0, 1]$, si on peut trouver une expression fermée de son inverse $F^{-1} : [0, 1] \longrightarrow \mathbb{R}$, on applique la méthode de transformation inversée
+afin de réaliser des simulations.
+
+Pour éclairer la méthode, on va étudier la fonction de répartition de la loi exponentielle. Pour rappel, une variable aléatoire suivant une loi exponentielle de paramètre
+$\lambda$ a pour fonction de densité $f(x) = \lambda e^{-\lambda x}$ pour $x \geq 0$, $0$ sinon. On a choisi cette loi parce qu'elle est munie d'une fonction de répartition facilement calculable
+et surtout dont l'inverse a une expression analytique. Calculons sa fonction de répartition:
+\begin{align*}
+    F(x) &= \int_{-\infty}^xf(t)dt \\
+    & = \int_{-\infty}^0 0 dt + \int_0^x \lambda e^{-\lambda t} dt \\
+    &= 0 + \left[-e^{-\lambda t}\right]_0^x \\
+    &= 1 - e^{-\lambda x}
+\end{align*}
+
+Calculons maintenant son inverse, $F^{-1}$ :
+\begin{align*}
+    y &= 1 - e^{-\lambda (F^{-1}(y))} \\
+    e^{\lambda (F^{-1}(y))} &= 1 - y \\
+    -\lambda F^{-1}(y) &= \ln(1 - y) \\
+    F^{-1}(y) &= \frac{-\ln(1 - y)}{\lambda}
+\end{align*}
+
+La loi exponentielle est l'une des quelques lois où l'on peut facilement trouver l'inverse de la fonction de répartition. Cela nous permet
+d'échantilloner une variable aléatoire $X \sim \exp(\lambda)$ efficacement à partir d'une seule réalisation d'une loi uniforme. Il s'agit tout
+simplement de tirer $U \sim \mathcal{U}(0, 1)$ et ensuite évaluer $X = F^{-1}(U)$.
+
+L'implémentation en R ne prend qu'une seule ligne:
+
+\begin{lstlisting}[language=R]
+    rexp_inv <- function(n, lambda = 1) {
+        # Generate n realizations of a uniform random variable n times
+        (-1 / lambda) * log(runif(n, 0, 1))
+    }
+\end{lstlisting}
+
+On peut facilement comparer la moyenne empirique avec la moyenne théorique. En effet, on sait que théoriquement, l'espérance de la loi exponentielle de paramètre $\lambda$ est $$g(x)=\lambda exp(-\lambda x)$$ Ainsi, on effectue la moyenne d'un grand nombre de réalisations pour plusieurs $\lambda$,  et on compare ces résultats avec la théorie. 
+
+On obtient alors le graphique suivant qui montre que les moyennes empiriques calculées pour chaque lambda correspondent aux valeurs théoriques de l'espérance.
+\begin{figure}[h!]
+    \centering
+    \include{plots/Rplot03.tex}
+
+    \vspace{-1cm}
+    \caption{Histogramme généré à partir d'un appel à \texttt{r\_std\_unif} avec $n = 1000000$. On initialise la graine de notre
+    générateur avec un appel à \texttt{set\_seed(0)}.}
+
+\end{figure}
+
+
+%%% PREUVE
+
+
+
+
+\section{Méthode d'acceptation-rejet}
+
+Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet.
+
+Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur le compact [0, 1] .
+
+Le principe est simple : on va borner f par une fonction g que l'on sait simuler. Ici, on prendra la fonction constante $g(x) = 1.5 $. On simule des points uniformément répartis sous la courbe de $g(x)$. Supposons que l'on souhaite générer 10 simulations, on tire alors 10 réalisations de $X \sim \mathcal{U}(0, 1)$ : on aura les abscisses des points.
+
+Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement l'abscisse de ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces valeurs, les abscisses des points acceptés donc, seront bien distribuées selon la loi $f(x)$.
+
+\newpage
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\linewidth]{media/graph_acceptation_rejet.png}
+
+\caption{app shiny pour faire la simulation}
+\end{figure}
+
+Sur ce graphique, on voit que les points en rouge se situant au-dessus de $f(x)$ seront rejetés tandis que les points blancs se situant en-dessous de la courbe seront acceptés.
+
+On peut facilement implémenter l'algorithme d'acceptation-rejet pour une loi quadratique suivant la densité $f(x) = 6x(1 - x)$ sur $[0, 1]$ sous R :
+\begin{lstlisting}[language=R]
+    rquad <- function(n) {
+
+        ind <- function(x) { 0 <= x & x <= 1 } # x \in [0, 1]
+        # Uniform density between (0, 1)
+        f <- function(x) {
+            6 * x * (1 - x) * ind(x)
+        }
+
+        g <- function(x) {
+            1 * ind(x)
+        }
+
+        c <- 1.5
+        out <- rep(0, n)
+
+        for (i in seq_len(n)) {
+
+            reject <- TRUE
+            z <- 0
+
+            while (reject) {
+
+                y <- runif(1)
+                u <- runif(1)
+
+                reject <- u > (f(y) / (c * g(y)))
+                z <- y
+            }
+
+            out[[i]] <- z
+        }
+
+        out
+    }
+\end{lstlisting}
+
+On simule alors $n = 10,000$ simulations avec \texttt{rquad(1e5)} pour vérifier si notre algorithm produit bien une variable aléatoire dont la densité
+$f(x) = 6x(1 - x)$ :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{media/rquad_sim.png}
+    \caption{10,000 réalisations d'une variable aléatoire dont la densité est une fonction quadratique. On a vérifié graphiquement que la méthode d'acceptation-rejet implémenté en \texttt{rquad}
+    permet de simuler une variable aléotoire avec $f(x) = 6x(1 - x)$.}
+\end{figure}
+
+
+\subsection{Loi normale}
+
+On peut aussi appliquer la méthode d'acceptation-rejet pour simuler la loi normale. Pour rappel, la loi normale a la fonction de densité suivante :
+$$f_X(x) = \frac{1}{\sigma \sqrt{2\pi}}\exp-\frac{1}{2}(\frac {x-\mu}{\sigma})^2$$
+
+Pour ce faire, on reproduit la même méthode expliquée ci-dessus. La différence est qu'avec la loi normale, nous avons un support non compact, $  \mathbb{R} $.
+
+Alors, nous majorons la fonction densité $f_X(x)$ en rouge de la loi normale par 
+$$g(x) = \left\{
+    \begin{array}{ll}
+        -\lambda\exp-\lambda x & \mbox{si } x \le 0 \\
+        \lambda\exp-\lambda x & \mbox{sinon.}
+    \end{array}
+\right. $$
+la densité de la loi "double exponentielle" en vert qui correspond à une variable exponentielle exp(1) affectée d'un signe positif ou négatif, tiré avec probabilité égale : 0.5.
+
+
+Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f_X(x)$.
+
+\newpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.3]{media/desmos-graph.png}
+\caption{Fonctions densités}
+\end{figure}
+
+On remarque que la fonction majorante en verte est extrêment serré autour de la fonction gaussienne que l'on souhaite à simuler. Plus la différence entre $f_X(x)$ et $g(x)$ est importante, plus le nombre
+d'itérations qu'il faut pour accepter une valeur est grand. Cela est évident quand on considère que la probabilité d'accepter une valeur proposée est $\frac{f_X(x)}{cg(x)}$. Quand $f_X(x)$ est près de $cg(x)$,
+la probabilité d'être accepté est presque 1.
+
+
+
+
+
+
+
+
+On peut  implémenter l'algorithme d'acceptation-rejet pour une loi normale centrée réduite sous R :
+\begin{lstlisting}[language=R]
+
+ rnorm_acc_std <- function(n) {
+
+    x <- vector("numeric", n)
+
+    for (i in 1:n) {
+
+        reject <- TRUE
+        z <- 0
+
+        while (reject) {
+
+            y1 <- rexp(1)
+            y2 <- rexp(1)
+
+            reject <- y2 < ((y1 - 1) * (y1 - 1) / 2)
+
+            z <- abs(y1)
+        }
+
+        if (runif(1) < 0.5) { z <- -z }
+        x[[i]] <- z
+    }
+
+    x
+
+}
+
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
+ Par ailleurs, on peut quantifier le nombre d'itérations qu'il faut pour simuler $n$ variables aléatoirement suivant une loi normale centrée réduite.
+
+\begin{figure}[h!]
+    \centering
+    \include{plots/avg_count_acc_rej.tex}
+    \caption{Moyenne des rejets}
+\end{figure}
+%%wtf comment on change le titre
+
+
+La pente de cette courbe représente le pourcentage de variables simulées totales sur le nombre de variable acceptées. Ce pourcentage vaut environ 1,35 c'est-à-dire que pour simuler 100 variables, il faudra en moyenne en tirer 135 en tout. Ce chiffre est spécifique au coeficient que nous avons choisi pour la fonction majorante $g(x)$
+
+%% on pourrait mettre 1 comme coef devant g(x) au lieu de sqrt(1/2e) et montrez que la pente est grave supérieure
+
+
+\subsection{Box-Muller}
+
+La loi normale n’a pas une densité à support compact et on ne connaît pas d’expression simple de l’inverse de sa
+fonction de répartition. On ne peut donc, théoriquement, employer la méthode de transformation inversée. On présente
+ici une méthode qui permet de simuler un couple des variables aléatoires normales, centrées, réduites et indépendantes.
+On veut simuler $X \sim \mathcal{N} (0, 1)$ et $Y \sim \mathcal{N} (0, 1)$ indépendantes. On connaît la densité jointe de $X$ et
+ $Y$ :
+
+$$f_X,_Y(x,y) = \frac{1}{2\pi}\exp(-\frac {x^2+y^2}{2})$$
+
+On effectue le passage en coordonnées polaires
+
+$$x = \rho \cos(\theta), y = \rho \sin(\theta)$$
+
+et on obtient
+
+$$f_X,_Y(x,y)dxdy = \frac {1}{2\pi}\exp(-\frac {\rho^2}{2})\rho d\rho d\theta = f_R,_\theta(\rho,\theta)d\rho d\theta$$
+
+Dans la densité jointe des variable $R$ et $\theta$, on reconnaît
+
+$\frac{1}{2\pi} =$ densité de $\theta$ qui suit une loi Uniforme sur 0 et 2 $\pi$.
+
+
+$\rho \exp(-\frac{\rho^2}{2}) = $densité de R.
+
+On en déduit la fonction de répartition de R :
+
+$$F_R(\rho) = 1- exp(-\frac{t^2}{2})$$
+
+On reconnaît une loi exponentielle de paramètres 1/2 pour $R^2$.\\
+On a donc les lois de $R$ et  $\theta$ :
+
+$$R^2 ~ \exp(\frac{1}{2}), \theta ~ U([0, 2\pi])$$
+
+La méthode consiste donc à tirer deux variables uniforme $U_1$ et $U_2$, puis on insère ces deux variables dans les formule suivante: \\
+
+$$R = \sqrt[1/2]{-2 \ln U_1}$$
+
+$$\theta = 2\pi U_2$$
+
+et on pose :
+
+$$X = R\cos\theta, \\
+Y = R\sin\theta$$
+
+Ces deux variables aléatoires sont indépendantes par construction leur densité jointe est définie comme le produit de leurs densités respectives .
+
+Remarque : Pour simuler $Z \sim N (\mu, \sigma^2 ),$ on simule $X \sim N (0, 1)$ et on effectue la transformation:
+
+ $$Z = \mu + \sigma X$$
+
+
+
+
+
+\section{Simulation géostatistique}
+
+\subsection{Motivation}
+
+Le monde de simulation classique opère sous l'hypothèse d'indépendance des réalisations successives. C'est-à-dire que le prochain
+valeur échantillonné n'a aucun rapport avec la valeur précédente. Si on considere qu'une région par exemple d'une montaigne où le terrain
+dans un rectangle 2 dimensionnel a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude son aléotoire, mais dans un
+certain sens leurs quantités sont liées géographiquement. Il existe une structure spatiale sur la région.
+
+La simulation géostatistique plusiers nouveaux conceptes inédit dans la simulation classique. Une idée intégrale de l'étude des processus
+stochastique spatiale c'est que la configuration des altitudes est considerée une variable régionalisée, ce qui veut dire qu'une certain terrain
+est une réalisations d'une fonction aléatoire. Comme l'angle d'etude est fondamentalement différent que la simulation classique, on doit approcher la simulation
+différamment.
+
+
+
+\section{R shiny}
+
+Pour faire la simulation sans passer par du code R, nous avons créé une interface web afin de récupérer les variables simulées.
+cette interface est implémentée avec la bibliothèque Rshiny, cette bibliothèque est simple à utiliser et permet de créer des sitewebs
+avec des applications(fonctions) qui s'exécutent en arrière-plan pour faire la simulation.
+
+Nous n'avons pas encore terminé de coder l'application mais dans la version finale l'utilisateur aura le choix de télécharger les variables
+Aléatoires simulés.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\linewidth]{media/apppic1.png}
+\vspace{-5cm}
+\caption{1,000 réalisations d'une variable aléatoire normale avec espérance 0 et variance 1}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\linewidth]{media/rshiny_gauss.png}
+\caption{Simulaton d'une loi gaussienne bivarié avec Cov$(X, Y) = 0.6$ et Var$(X)$ = Var$(Y) = 1$.}
+\end{figure}
+
+\section{Conclusion}
+
+Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation mutlivariée et en spatial. 
+%%Pour cela nous avons utilisé les méthode de 
+
+Il y a plusieurs choses que nous aurions pu amélorier au cours du projet.
+Tout d'abord, les boucles en R sont plutôt lentes. Pour la suite, nous aurions pu implémenter les fonctions en C en utilisant le package Rcpp. Pour suivre, nous aurions tenter d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
+de modifier l'état du générateur en même temps.
+
+
+Ce projet d'initiation a été une véritable découverte pour nous, puisque on a appris à utiliser de nouveaux langages de programmation, R et Rshiny. De plus, on a découvert la simulation de variables aléatoires multivariées qui sont utiles lorsque l'on veut simuler certains phénomènes physiques.
+
+
+
+\end{document}
