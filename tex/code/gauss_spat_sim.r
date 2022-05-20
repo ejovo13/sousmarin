@@ -30,12 +30,3 @@ for(i in 1:grid_n) {
 }
 
 image(big_image, col = hcl.colors(5, palette = "viridis"), bty = "n", xaxt = "n", yaxt = "n")
-
-# library(tikzDevice)
-
-# tikz(file = "test.tex", width = 5, height = 3)
-# dev.off()
-
-# plt.mv2()
-
-

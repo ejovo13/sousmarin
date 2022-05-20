@@ -1,5 +1,6 @@
 library(pracma)
 library(purrr)
+library(testit)
 
 library(Rcpp)
 sourceCpp(file = "src/krigeage.cpp")
@@ -41,7 +42,7 @@ get_cov_row_lambda <- function(coords_list, i, n_obs, a = sqrt(8)) {
 
     for (j in 1:len_out) {
         c2 <- coords_list[[j + i - 1]]
-        x[j] <- cov_model(coord_to_dist(c1, c2), a)
+        x[j] <- cov_model_exp(coord_to_dist(c1, c2), a)
     }
 
     x
@@ -52,6 +53,8 @@ get_cov_row_lambda <- function(coords_list, i, n_obs, a = sqrt(8)) {
 get_cov_matrix_lambda <- function(coords_list, a = sqrt(8)) {
 
     n_obs <- length(coords_list)
+    sigma <- matrix(rep(0, n_obs * n_obs), nrow = n_obs)
+
     for (i in 1:n_obs) {
         sigma[i, i:n_obs] <- get_cov_row_lambda(coords_list, i, n_obs, a)
     }
@@ -72,7 +75,7 @@ get_cov_obs <- function(coords_list, x, n, a = sqrt(8)) {
 
     for (i in 1:n_obs) {
         c2 <- coords_list[[i]]
-        out[i] <- cov_model(coord_to_dist(cx, c2), a)
+        out[i] <- cov_model_exp(coord_to_dist(cx, c2), a)
     }
 
     out
@@ -86,4 +89,52 @@ get_lambda <- function(coords_list, x, n, a = sqrt(8)) {
     b <- get_cov_obs(coords_list, x, n, a)
 
     solve(A, b)
+}
+
+# Final function to simulate a gaussian field
+sim_gauss_field_exp <- function(grid_nrow, a = 2, mu = -1) {
+
+    # if mu == -1, then the default value was never changed, set mv = 0
+    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    else { mean_vector <- mu }
+
+    Sigma <- get_cov_matrix_exp(grid_nrow, a)
+    matrix(c(rmvnorm(1, mean_vector = mean_vector, sigma = Sigma)), byrow = TRUE, nrow = grid_nrow)
+
+}
+
+# Final function to simulate a gaussian field
+sim_gauss_field_gauss <- function(grid_nrow, a = 2, m = 1, mu = -1) {
+
+    # if mu == -1, then the default value was never changed, set mv = 0
+    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    else { mean_vector <- mu }
+
+    Sigma <- get_cov_matrix_gauss(grid_nrow, a, m)
+    matrix(c(rmvnorm(1, mean_vector = mean_vector, sigma = Sigma)), byrow = TRUE, nrow = grid_nrow)
+
+}
+
+# Final function to simulate a gaussian field
+sim_gauss_field_tent <- function(grid_nrow, a = 3, sigma = 5, mu = -1) {
+
+    # if mu == -1, then the default value was never changed, set mv = 0
+    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    else { mean_vector <- mu }
+
+    Sigma <- get_cov_matrix_tent(grid_nrow, a, sigma)
+    matrix(c(rmvnorm(1, mean_vector = mean_vector, sigma = Sigma)), byrow = TRUE, nrow = grid_nrow)
+
+}
+
+# Final function to simulate a gaussian field
+sim_gauss_field_sphere <- function(grid_nrow, a = 6, m = 1, mu = -1) {
+
+    # if mu == -1, then the default value was never changed, set mv = 0
+    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    else { mean_vector <- mu }
+
+    Sigma <- get_cov_matrix_sphere(grid_nrow, a, m)
+    matrix(c(rmvnorm(1, mean_vector = mean_vector, sigma = Sigma)), byrow = TRUE, nrow = grid_nrow)
+
 }

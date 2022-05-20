@@ -9,8 +9,8 @@ coord_to_dist <- function(p1, p2) {
     .Call(`_sousmarin_coord_to_dist`, p1, p2)
 }
 
-cov_model_exp_cpp <- function(d, a = 2) {
-    .Call(`_sousmarin_cov_model_exp_cpp`, d, a)
+cov_model_exp <- function(d, a = 2) {
+    .Call(`_sousmarin_cov_model_exp`, d, a)
 }
 
 #' @export

@@ -34,15 +34,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cov_model_exp_cpp
-double cov_model_exp_cpp(const double d, double a);
-RcppExport SEXP _sousmarin_cov_model_exp_cpp(SEXP dSEXP, SEXP aSEXP) {
+// cov_model_exp
+double cov_model_exp(const double d, double a);
+RcppExport SEXP _sousmarin_cov_model_exp(SEXP dSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const double >::type d(dSEXP);
     Rcpp::traits::input_parameter< double >::type a(aSEXP);
-    rcpp_result_gen = Rcpp::wrap(cov_model_exp_cpp(d, a));
+    rcpp_result_gen = Rcpp::wrap(cov_model_exp(d, a));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -195,7 +195,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_sousmarin_ind_to_coord", (DL_FUNC) &_sousmarin_ind_to_coord, 2},
     {"_sousmarin_coord_to_dist", (DL_FUNC) &_sousmarin_coord_to_dist, 2},
-    {"_sousmarin_cov_model_exp_cpp", (DL_FUNC) &_sousmarin_cov_model_exp_cpp, 2},
+    {"_sousmarin_cov_model_exp", (DL_FUNC) &_sousmarin_cov_model_exp, 2},
     {"_sousmarin_cov_model_gauss", (DL_FUNC) &_sousmarin_cov_model_gauss, 3},
     {"_sousmarin_cov_model_sphere", (DL_FUNC) &_sousmarin_cov_model_sphere, 3},
     {"_sousmarin_cov_model_tent", (DL_FUNC) &_sousmarin_cov_model_tent, 3},
