@@ -8,7 +8,7 @@
 
 \title{Simulation conditionnelle d'un processus gaussien}
 \author{NEEL Pauline, PETROS Russom Samson, RAKOTOVAO Jonathan, VOYLES Evan}
-\date{19 Mai 2022}
+\date{20 Mai 2022}
 
 
 \begin{document}
@@ -603,12 +603,8 @@ Remarque : Pour simuler $Z \sim N (\mu, \sigma^2 ),$ on simule $X \sim N (0, 1)$
  l'algorithme est simple à implémenter, la première étape consiste juste à générer des variables aléatoires qui suivent une loi normale centrée réduite et qui ne sont pas corrélées. Ensuite nous faisons une décomposition de Cholesky de la matrice de covariance selon laquelle nous voulons faire la simulation de vecteurs gaussiens,la fonction de R {\it chol()} est utilisé pour la décomposition. Après la décomposition nous obtenons une matrice triangulaire inférieure \textbf{L} .
  Finalement la transformation affine de l'étape 3 nous permet d'avoir une vecteur gaussien avec la bonne ésperance et matrice de covariance.
 
- \
- \underline{Exemple:En deux dimension}:
+ Pour voir un exemple en deux dimensions, veuillez regarder la une de ce rapport.
 
-
-
- \
  \underline{Preuve}:
 
  La matrice de covariance de tout vecteur aléatoire $ \textbf{Y} $
@@ -775,43 +771,47 @@ quelques simulations de ce sort avant de détailler la méthodologie au niveau a
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/tent.png}
-        \caption{Tent}
+        \caption{$C(h) = \sigma^2(1 - \frac{|h|}{a})$}
         \label{fig:three sin x}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/exp6_1.png}
-        \caption{}
+        \caption{$C(h) = m \exp (-\frac{|h|}{a})$}
         \label{fig:five over x}
     \end{subfigure}
-       \caption{Three simple graphs}
+       \caption{En (a) on a une réalisation d'un champ gaussien avec fonction de covariance gaussienne. En (b) notre vecteur gaussien a pour modèle de covariance le modèle de tente.
+       finalement en (c) on a un modèle exponentiel}
        \label{fig:three graphs}
 \end{figure}
+
+\newpage
 
 \begin{figure}[h!]
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/gauss_2.7_1_1.png}
-        \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
+        % \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
         \label{gauss plasma}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/sphere.png}
-        \caption{Sphere}
+        % \caption{Sphere}
         \label{fig:three sin x}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/exp_2.png}
-        \caption{}
+        % \caption{}
         \label{fig:five over x}
     \end{subfigure}
-       \caption{Three simple graphs}
+       \caption{Encore 3 réalisations d'un champ gaussien en quadrants. A gauche on a une covariance gaussienne, au milieu une covariance
+       sphérique, et à droite une covariance exponentielle}
        \label{fig:three graphs}
 \end{figure}
 
