@@ -92,10 +92,53 @@ rnorm_acc_std <- function(n) {
 
 }
 
+sourceCpp(code = "
+
+    #include <Rcpp.h>
+
+    using namespace Rcpp;
+
+    //' @export
+    // [[Rcpp::export]]
+    NumericVector rnorm_acc_std_cpp(const int n) {
+
+        NumericVector x (n);
+
+        double z = 0;
+        bool reject = false;
+        double y1;
+        double y2;
+
+        for (int i = 0; i < n; i++) {
+
+            z = 0;
+            reject = true;
+
+            while (reject) {
+
+                y1 = R::rexp(1);
+                y2 = R::rexp(1);
+
+                reject = y2 < ((y1 - 1) * (y2 - 1) / 2);
+
+                z = std::abs(y1);
+            }
+
+            z *= std::pow(-1, (R::runif(0, 1) < 0.5));
+            x[i] = z;
+
+        }
+
+        return x;
+
+    }
+
+")
+
 # Simulate n realizations of a normal with mean \mu and standard deviation \sd
 #' @export
 rnorm_acc <- function(n, mu = 0, sd = 1) {
-    rnorm_acc_std(n) * sd + mu
+    rnorm_acc_std_cpp(n) * sd + mu
 }
 
 #' @export
