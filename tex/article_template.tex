@@ -981,15 +981,14 @@ dont $n$ dépasse $100$. C'est là que nous pourrions parler d'autres méthodes 
 champ gaussien de covariance exponentielle.
 
 
-\subsection{Krigeage} La dernière partie de notre projet s'oriente autour d'une méthode dite le krigéage, qui est effectivement une union de la simulation spatiale
-avec le problème numérique des moindres carrés. Il s'agit d'un ensemble des observations $Z(s)$ pour un certain nombre de sites $s \in \mathcal{D}$. Par exemple, on pourrait
-prendre $Z(s)$ la concentration d'une chimique sur la surface d'une région réctangulaire. Comme il est impossible d'observer la concentration à chaque site $s \in \mathbb{R}^2$,
-on se contente d'observer un nombre fini de mesurements et en déduire les valeurs pour les autres sites dont la concentration est inconnue.
+\subsection{Krigeage} La dernière partie de notre projet s'oriente autour de la methode dite krigeage, qui est effectivement une union de la simulation spatiale
+avec le problème numérique des moindres carrés. Il s'agit d'interpoler à partir d'un ensemble des observations $Z(s)$ pour un certain nombre de sites $s \in \mathcal{D}$. Par exemple, on pourrait
+prendre $Z(s)$ la concentration chimique sur la surface d'une région rectangulaire. Comme il est impossible d'observer la concentration à chaque site $s \in \mathbb{R}^2$,
+on se contente d'observer la concentration en un nombre finie de site et en déduire les valeurs pour les autres sites dont la concentration est inconnue.
 
-    Commencer avec un petit nombre de mesurements et en déduire le reste? Bien sûr qu'il s'agit d'un problème d'interpolation!
 
-La formulation mathématique est la suivante : Donnée un ensemble de $n$ sites $\{s_1, \dots, s_n\}$ et leurs mesurements associés $Z(s_i)$, estimer
-$\hat Z(s)$ pour tout $s \in \mathcal{D}$. La théorie c'est de construire un estimateur $\hat Z$ qui est exacte, c'est-à-dire que $\hat Z(s_i) = Z(s_i)$ pour
+La formulation mathématique est la suivante :On commence avec un ensemble de $n$ sites $\{s_1, \dots, s_n\}$ et leurs mesures associés $Z(s_i)$, et estimer
+$\hat Z(s)$ pour tout $s \in \mathcal{D}$. La théorie consiste a construire un estimateur $\hat Z$ qui est exacte, c'est-à-dire que $\hat Z(s_i) = Z(s_i)$ pour
 tout $s_i$ appartenant à l'ensemble des \textbf{observations}, et qui est formé d'une combinaison linéaire des observations connues :
 $$ \hat Z(s) =  \sum \lambda_i Z(s_i).$$
 
@@ -1019,18 +1018,18 @@ Avec cela en tête, on écrit le système à résoudre pour trouver les poids $\
 \end{pmatrix}
 \end{equation}
 
-Il est intéressant à remarquer que pour chaque $s \in \mathcal{D}$ dont on aimerait estimer $\hat Z(s)$, le système d'équations à résoudre de dépend
+Il est intéressant à remarquer que pour chaque $s \in \mathcal{D}$ dont on aimerait estimer $\hat Z(s)$, le système d'équations à résoudre ne dépend
 \textbf{pas} des valeurs observés $Z(s_i)$! Cela veut dire que l'importance de $Z(s_i)$ contribuant pour le calcul final $\hat Z(s_i)$, c'est-à-dire les poids $\lambda_i$, ne dépend \textbf{que}
 sur la configuration spatiale des données. Le modèle de covariance utilisé détermine la valeur de chaque poids qui en revanche determinent la valeur de l'estimateur
-$\hat Z(s)$. Sans tarder, étudierons un exemple avec $\mathcal{D} = \mathbb{R}^2$.
+$\hat Z(s)$. Sans tarder, étudions un exemple avec $\mathcal{D} = \mathbb{R}^2$.
 
 \subsubsection{Réalisation du krigeage}
 
-Vu qu'on est pas munis des mesurements avec lesquelles on pourrait interpoler, on va utiliser la méthode décrite dans la dernière section pour simuler un champ gaussien
+Vu qu'on est pas munis des mesures avec lesquelles on pourrait interpoler, on va utiliser la méthode décrite dans la dernière section pour simuler un champ gaussien
 avec covariance exponentielle. Ensuite, on va échantilloner au hasard $n_{obs}$ sites et afin de réaliser l'interpolation spatiale. Commen\c cons avec une grille de 50 fois 50,
 et nous prenons $n_{obs} = 100$.
 
-Après la réalisation d'un champ gaussien, on va calculer $\hat Z(s)$ pour toute site dans notre grille, en résoulant un système d'équations \textbf{unique} pour chaque $s \in \mathcal{D}$, après
+Après la réalisation d'un champ gaussien, on va calculer $\hat Z(s)$ pour toute site de notre grille, en résolvant un système d'équations \textbf{unique} pour chaque $s \in \mathcal{D}$, après
 lequel on calcule la somme $$ \hat Z(s) =  \sum \lambda_i Z(s_i).$$
 \newpage
 
@@ -1121,10 +1120,10 @@ Pour le plaisir on simule deux autres instances du krigeage
        \label{fig:three graphs}
 \end{figure}
 
-Ce qui est important à retenir c'est que les illustrations à droites ne sont pas censées à réproduire le champ à gauche avec lequel
-on est partir. Ce qui fait le krigeage, comme l'interpolation polynômiale, c'est de toucher les bonnes valeurs où les mesurements ont été observés puis ensuite
+Ce qui est important à retenir est que les illustrations à droites ne sont pas censées réproduire le champ à gauche avec lequel
+on est partir. Ce que le krigeage fait , comme l'interpolation polynômiale, c'est de toucher les bonnes valeurs où les mesures ont été observés puis ensuite
 estimer les valeurs inconnues entres les observations du sorte que l'espérance entre $\mathbb{E}[\hat Z(s) - Z(s)]$ soit minimisée. En appliquant cette stratégie envers
-un ensemble des mesurements de profondeurs d'un câble sous-marin, on peut effectivement interpoler la profondeur entre les sites de mesurements afin de calculer sa longueur.
+un ensemble de mesures de profondeurs d'un câble sous-marin, on peut effectivement interpoler la profondeur entre les sites de mesures afin de calculer sa longueur.
 
 Malheuresement on a pas eu l'ocassion de travailler avec des données réelles, mais cela a été épanouissant d'aboutir la méthodologie spatiale.
 
@@ -1186,9 +1185,9 @@ les plots dans ce rapport se trouve sous le dossier \texttt{tex} du répo github
 
 Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant
 uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes
- d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation
- mutlivariée et en spatial. Pour cela nous avons utilisé les méthode  de krigeage et éventuellement
- nous allons voir si nous pouvons implémenter la méthode spectrale pour simuler des processus gaussiens
+d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation
+mutlivariée et en spatial. Pour cela nous avons utilisé les méthode  de krigeage et éventuellement
+nous allons voir si nous pouvons implémenter la méthode spectrale pour simuler des processus gaussiens
 
 \section{Ce que nous pourrions amélirorer}
 \subsection{Vitesse}
