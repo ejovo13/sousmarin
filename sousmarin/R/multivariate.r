@@ -45,6 +45,26 @@ rmvnorm <- function(n, sigma, mean_vector) {
     t(mean_matrix + (L %*% u))
 }
 
+#' Simulate a gaussian vector from a lower triangular matrix
+#' that is the result of a cholesky factorization of Sigma
+#' @export
+rmvnorm_chol <- function(n, L, mean_vector) {
+
+    m <- ncol(L)
+
+# Replicate the mean_vector n times
+    mean_matrix <- matrix(mean_vector, nrow = m, ncol = n)
+
+    # Now generate n * m random variables, storing them in an m x n matrix
+    u <- matrix(rnorm(n * m), nrow = m, ncol <- n)
+
+    # Apply L to u and add the mean vector
+    # Z = m + Lu
+    t(mean_matrix + (L %*% u))
+
+
+}
+
 #' Make a matrix symmetric
 #'
 #' This routine is used to create a matrix variate that is a part of the Gaussian Orthogonal Ensemble

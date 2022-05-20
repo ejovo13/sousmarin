@@ -10,6 +10,7 @@
 #'
 #' @docType package
 #' @name sousmarin
-#' @importFrom Rcpp evalCpp
+#' @importFrom Rcpp evalCpp sourceCpp
+#' @useDynLib sousmarin, .registration = TRUE
 NULL
 #> NULL
