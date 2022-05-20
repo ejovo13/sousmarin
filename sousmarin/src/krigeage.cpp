@@ -19,7 +19,7 @@ double coord_to_dist(const NumericVector& p1, const NumericVector& p2) {
 
 /* is this a fucking joke */
 // [[Rcpp::export]]
-double cov_model_exp_cpp(const double d, double a = 2) {
+double cov_model_exp(const double d, double a = 2) {
     return std::exp(-(d / a));
 }
 
@@ -52,7 +52,7 @@ NumericVector get_cov_row_exp(const int i, const int grid_nrow, const double a =
     auto c1 = ind_to_coord(i, grid_nrow);
 
     for (int j = 0; j < len_out; j++) {
-        x[j] = cov_model_exp_cpp(coord_to_dist(c1, ind_to_coord(j + i, grid_nrow)), a);
+        x[j] = cov_model_exp(coord_to_dist(c1, ind_to_coord(j + i, grid_nrow)), a);
     }
 
     return x;
