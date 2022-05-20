@@ -666,7 +666,7 @@ $s \in \mathcal{D} = \mathbb{R}$ une profondeur $Z(s) \in \mathbb{R}$. Un autre 
 
 \subsubsection{Stationnarité}
 
-Une idée qui est super-importants dans l'étude des fonctions aléatoires spatiale est l'idée de la stationnarité.la stationnarité est le concept que pour un processus stochastique,
+Une idée qui est super importants dans l'étude des fonctions aléatoires spatiale est l'idée de la stationnarité.la stationnarité est le concept que pour un processus stochastique,
 il existe des propriétés qui sont invariantes aux déplacements dans l'espace. Souvent classifiés sur le principe des \textit{moments statistiques}, la stationnarité nous permet de simplifier nos modèles mathématiques des
 phénomènes réels.
 
@@ -744,9 +744,9 @@ Par exemple, $d(s1, s5) = ||(1, 1) - (2, 2)||_2 = \sqrt{2}$.
 %%processus stationnaire à l'ordre 2. De plus, on suppose que la covariance de $Z$ suit un modèle exponentielle
 %%$$ C(h) = e^{\frac{-|h|}{a}}. $$
 
-Maintenant, nous sommes équipés d'une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste plus qu'à faire des hypothèses sur une fonction aléatoire 
-sur $\mathcal{D}$ si l'on veut simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, nous supposons que $Z$ est un processus stationnaire d'ordre 2. 
-De plus, nous supposons que la covariance de $Z$ suit un modèle exponentiel C(h) = e^{frac{-|h|}{a}}.
+Maintenant, nous sommes équipés d'une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste plus qu'à faire des hypothèses sur une fonction aléatoire
+sur $\mathcal{D}$ si l'on veut simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, nous supposons que $Z$ est un processus stationnaire d'ordre 2.
+De plus, nous supposons que la covariance de $Z$ suit un modèle exponentiel $C(h) = e^{frac{-|h|}{a}}$.
 
 
 %%Comme on a une fonction de distance, on prend $h$ = $d(s_i, s_j)$. C'est maintenant où on relie les des côtés de simulation : On suppose que
@@ -754,9 +754,9 @@ De plus, nous supposons que la covariance de $Z$ suit un modèle exponentiel C(h
 %%qu'à déterminer une matrice de covariance. C'est ici où on utilise la structure spatiale de notre grille et les distances entre eux pour computer une matrice
 %%de covariance et simuler un vecteur gaussien en utilisant la méthode de cholesky.
 
-Puisque nous avons une fonction de distance, nous prenons $h$ = $d(s_i, s_j)$. C'est maintenant que nous connectons les deux côtés de la simulation : 
-Nous supposons que la valeur de la variable régionalisée est un vecteur gaussien avec une espérance $\vec\mu$ et une matrice de covariance $\Sigma$. 
-Si nous prenons $\vec\mu = \textbf{0}$ il ne reste plus qu'à déterminer une matrice de covariance. C'est ici que nous utilisons la structure spatiale 
+Puisque nous avons une fonction de distance, nous prenons $h$ = $d(s_i, s_j)$. C'est maintenant que nous connectons les deux côtés de la simulation :
+Nous supposons que la valeur de la variable régionalisée est un vecteur gaussien avec une espérance $\vec\mu$ et une matrice de covariance $\Sigma$.
+Si nous prenons $\vec\mu = \textbf{0}$ il ne reste plus qu'à déterminer une matrice de covariance. C'est ici que nous utilisons la structure spatiale
 de notre grille et les distances entre elles pour calculer une matrice de covariance et simuler un vecteur gaussien en utilisant la méthode de Cholesky.
 
 
@@ -822,9 +822,9 @@ quelques simulations de ce sort avant de détailler la méthodologie au niveau a
 %%calculé selon un modèle choisit. Nous utiliserons le modèle exponentielle pour commencer. Finalement, pour simplifier l'exemple on prend une espérance
 %%$\mu = \textbf{0} \in \mathbb{R}^9$.
 
-Prenons l'exemple d'une grille de $3$ lignes et $3$ colonnes. Pour simuler une réalisation de la fonction aléatoire $Z$ nous procédons à 
-la simulation d'un vecteur gaussien de $9$ éléments, dont la matrice de covariance $\Sigma$est déterminée par l'hypothèse de stationnarité 
-forte (aux ordres 1 et 2) et calculée selon un modèle choisi. Nous utiliserons le modèle exponentiel pour commencer. Enfin, pour simplifier 
+Prenons l'exemple d'une grille de $3$ lignes et $3$ colonnes. Pour simuler une réalisation de la fonction aléatoire $Z$ nous procédons à
+la simulation d'un vecteur gaussien de $9$ éléments, dont la matrice de covariance $\Sigma$est déterminée par l'hypothèse de stationnarité
+forte (aux ordres 1 et 2) et calculée selon un modèle choisi. Nous utiliserons le modèle exponentiel pour commencer. Enfin, pour simplifier
 l'exemple, nous prenons une espérance $\mu = \textbf{0} \in \mathbb{R}^9$.
 
 Pour simuler un vecteur gaussien dans $\mathbb{R}^9$, on a besoin d'une matrice de covariance de $9$ lignes et $9$ colonnes :
@@ -869,7 +869,7 @@ $$
 %%bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre une site fixe et \textbf{toutes} les autres sites.
 %%Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple,
 
-Comme la matrice $Sigma $ est symétrique, nous ne remplissons que la partie triangulaire supérieure de $H$ Illustrons 
+Comme la matrice $Sigma $ est symétrique, nous ne remplissons que la partie triangulaire supérieure de $H$ Illustrons
 un des calculs pour bien comprendre ce que nous venons de calculer. Pour chaque ligne, nous souhaitons calculer la covariance
 entre un site fixe et \textbf{tous} les autres sites. Pour la première ligne, nous avons calculé les distances entre
 $s_1$ et $s_i \in \{s_1, \dots, s_9\}$.Par exemple,
@@ -881,14 +881,14 @@ $s_1$ et $s_i \in \{s_1, \dots, s_9\}$.Par exemple,
     H_{1, 6} &= d(s_1, s_6) = ||(1, 1) - (2, 3)||_2 = \sqrt{5}.
 \end{align*}
 
-%%Une dernière étape c'est d'appliquer le modèle de covariance exponentielle $C(h; a) = \exp(\frac{-|h|}{a})$ 
+%%Une dernière étape c'est d'appliquer le modèle de covariance exponentielle $C(h; a) = \exp(\frac{-|h|}{a})$
 %%pour tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est implémenté par la fonction
-%%\texttt{get\_cov\_matrix\_exp(n, a)} pour une grille de $n$ lignes et $n$ colonnes. 
+%%\texttt{get\_cov\_matrix\_exp(n, a)} pour une grille de $n$ lignes et $n$ colonnes.
 %%Pour notre exemple, on appelle \texttt{get\_cov\_matrix\_exp(3, 1)}.
 
 Une dernière étape consiste à appliquer le modèle de covariance exponentielle $C(h ; a) = \exp(\frac{-|h|}{a})$ pour
-tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est mis en œuvre par la fonction \texttt{get\_cov\_matrix_exp(n, a)}
-pour une grille de $n$ lignes et $n$ colonnes. Dans notre exemple, nous appelons la fonction \texttt{get\_cov\_matrix_exp(3, 1)}.
+tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est mis en œuvre par la fonction \texttt{get\_cov\_matrix\_exp(n, a)}
+pour une grille de $n$ lignes et $n$ colonnes. Dans notre exemple, nous appelons la fonction \texttt{get\_cov\_matrix\_exp(3, 1)}.
 
 
 $$
@@ -968,16 +968,16 @@ une matrice de covariance $\Sigma = C(H ; a)$ suivant un modèle exponentiel ave
 %%Pour élucider plus de structure, on fait augmenter la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$ lignes et $n^2$ colonnes pour une grille $n$ fois $n$, le nombre d'opérations juste pour
 %%calculer $\Sigma$ est de complexité $\mathcal{O}(n^4)$! Et finalement la décomposition de Cholesky est de compléxité $\mathcal{O}(n^3)$ ainsi que la multiplication matricielle.
 
-Pour élucider plus de structures, nous augmentons la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$ 
-ligne et $n^2$ colonne pour une grille $n$ fois $n$le nombre d'opérations droites pour calculer $\Sigma$est de complexité $\mate cal{O}(n^4)$ .
-Et enfin, la décomposition de Cholesky est de complexité $\mate cal{O}(n^3)$ ainsi que la multiplication de la matrice.
+Pour élucider plus de structures, nous augmentons la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$
+ligne et $n^2$ colonne pour une grille $n$ fois $n$ le nombre d'opérations droites pour calculer $\Sigma$ est de complexité $\mathcal{O}(n^4)$ .
+Et enfin, la décomposition de Cholesky est de complexité $\mathcal{O}(n^3)$ ainsi que la multiplication de la matrice.
 
 %%En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions donc elle n'est pas traitable pour des grilles dont $n$
 %%dépasse $100$. C'est ici où on pourrait parler des autre méthodes telle que la méthode spectrale pour simuler plus efficacement un champ gaussien de covariance
 %%exponentielle.
 
-En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions et n'est donc pas exploitable pour des grilles 
-dont $n$ dépasse $100$. C'est là que nous pourrions parler d'autres méthodes comme la méthode spectrale pour simuler plus efficacement un 
+En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions et n'est donc pas exploitable pour des grilles
+dont $n$ dépasse $100$. C'est là que nous pourrions parler d'autres méthodes comme la méthode spectrale pour simuler plus efficacement un
 champ gaussien de covariance exponentielle.
 
 
