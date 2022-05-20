@@ -254,7 +254,7 @@ d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.28
 
 \subsubsection{Simulation de différentes lois}
 
-Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Dans la prochaine partie, nous allons implémenter la méthode de transformation inversée, pour simuler une loi exponentielle. Ensuite nous verrons la méthode d'acceptation-rejet pour simuler une loi normale, et finalement la méthode de Box-Muller. Tous ces  algorithmes sont contruits à partir de runif, fonction de R qui distribue une variable aléatoire uniforme.
+Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Dans la prochaine partie, nous allons implémenter la méthode de transformation inversée, pour simuler une loi exponentielle. Ensuite nous verrons la méthode d'acceptation-rejet pour simuler une loi normale, et Finalement la méthode de Box-Muller. Tous ces  algorithmes sont contruits à partir de runif, fonction de R qui distribue une variable aléatoire uniforme.
 
 \subsection{Méthode de transformation inversée}
 
@@ -958,6 +958,8 @@ Nous pourrions appliquer d'autres modèles de covariance pour modifier la dépen
 Nous appelons maintenant notre fonction \texttt{rmvnorm} pour simuler un vecteur gaussien dans $\mathbb{R}^9$ avec une espérance $0$ et
 une matrice de covariance $\Sigma = C(H ; a)$ suivant un modèle exponentiel avec $a = 3$.
 
+\newpage
+
 \begin{figure}[h!]
     \centering
     \includegraphics[width=5cm]{media/grid9.png}
@@ -1032,7 +1034,6 @@ et nous prenons $n_{obs} = 100$.
 
 Après la réalisation d'un champ gaussien, on va calculer $\hat Z(s)$ pour toute site dans notre grille, en résoulant un système d'équations \textbf{unique} pour chaque $s \in \mathcal{D}$, après
 lequel on calcule la somme $$ \hat Z(s) =  \sum \lambda_i Z(s_i).$$
-\newpage
 
 
 \begin{figure}[h!]
@@ -1144,16 +1145,17 @@ Aléatoires simulés.
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/apppic1.png}
-        \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
+        % \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
         \label{gauss plasma}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{media/rshiny_gauss.png}
-        \caption{Sphere}
+        % \caption{Sphere}
         \label{fig:three sin x}
     \end{subfigure}
+    \caption{Captures d'écran de l'application shiny hébérgé \href{https://sousmarin.shinyapps.io/shinysousmarin/}{ici}}
 \end{figure}
 
 % \begin{figure}[h!]
