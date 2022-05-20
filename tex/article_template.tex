@@ -569,7 +569,7 @@ $$R^2 ~ \exp(\frac{1}{2}), \theta ~ U([0, 2\pi])$$
 
 La méthode consiste donc à tirer deux variables uniforme $U_1$ et $U_2$, puis on insère ces deux variables dans les formule suivante: \\
 
-$$R = \sqrt[1/2]{-2 \ln U_1}$$
+$$R = \sqrt{-2 \ln U_1}$$
 
 $$\theta = 2\pi U_2$$
 
@@ -611,11 +611,31 @@ Remarque : Pour simuler $Z \sim N (\mu, \sigma^2 ),$ on simule $X \sim N (0, 1)$
 
  \
  \underline{Exemple:En deux dimension}:
+    
 
 
  \
  \underline{Preuve}:
 
+ La matrice de covariance de tout vecteur aléatoire $ \textbf{Y} $ est donnée par $ \mathbb{E}(\textbf{YY^T})$, où $ \mathbb{Y} $ est 
+ un vecteur colonne aléatoire de taille $\it{n×1}$. Prenez maintenant un vecteur aléatoire, \textbf{X}, constitué de variables aléatoires
+  non corrélées, chaque variable aléatoire, $ \textbf{X_i} $, ayant une moyenne nulle et une variance unitaire de 1. Puisque les $\textbf{X_i}$ 
+  sont des variables aléatoires non corrélées de moyenne nulle et de variance unitaire, nous avons $\mathbb{E}(\textbf{X_iX_j})= \delta_{ij} $. 
+  Par conséquent,
+
+$$\mathbb{E}(\textbf{XX^T}) = \mathbb{I} $$
+
+
+Pour générer un vecteur aléatoire avec une matrice de covariance $\Sigma$ donnée, on regarde la décomposition de Cholesky de $\Sigma$, 
+c'est-à-dire $\Sigma =\textbf{LL^T} $. Notez qu'il est possible d'obtenir une décomposition de Cholesky de $\Sigma$ puisque, par définition, 
+la matrice de covariance $\Sigma $ est symétrique et définie positive. 
+
+Considérons maintenant le vecteur aléatoire $\textbf{Z=LX}$. Nous avons
+
+ $$ \mathbb{E}(\textbf{ZZ^T}) = \mathbb{E}(\textbf{(LX)(LX)^T}) = \mathbb{E}(\textbf{LXX^{T}L^{T}}) = 
+ \textbf{L}\mathbb{E}(\textbf{XX^{T}})\textbf{L^{T}} = \textbf{LIL^{T}} = \Sigma $$
+
+Par conséquent, le vecteur aléatoire Z possède la matrice de covariance souhaitée, $ \Sigma $.
 
 
 \section{Simulation géostatistique}
