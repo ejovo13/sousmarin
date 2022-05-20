@@ -619,7 +619,7 @@ $$\mathbb{E}(\textbf{XX}^T) = \text{Id} $$
 
 
 Pour générer un vecteur aléatoire avec une matrice de covariance $\Sigma$ donnée, on regarde la décomposition de Cholesky de $\Sigma$,
-c'est-à-dire $\Sigma =\textbf{LL}^T $. Notez qu'il est possible d'obtenir une décomposition de Cholesky de $\Sigma$ puisque, par définition,
+c'est-à-dire $\Sigma =\textbf{LL}^T $. Notons qu'il est possible d'obtenir une décomposition de Cholesky de $\Sigma$ puisque, par définition,
 la matrice de covariance $\Sigma $ est symétrique et définie positive.
 
 Considérons maintenant le vecteur aléatoire $\textbf{Z} = \textbf{LX}$. Nous avons
@@ -634,18 +634,18 @@ Par conséquent, le vecteur aléatoire Z possède la matrice de covariance souha
 
 \subsection{Motivation}
 
-Le monde de simulation classique opère sous l'hypothèse d'indépendance des réalisations successives. C'est-à-dire que le prochain
-valeur échantillonnée n'a aucun rapport avec la valeur précédente. Si on considère qu'une région par exemple d'une montagne ou le terrain
-dans un rectangle 2 dimensionnel a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude son aléatoires, mais dans un
+Le monde de la simulation classique opère sous l'hypothèse d'indépendance des réalisations successives. C'est-à-dire que la prochaine
+valeur échantillonnée n'a pas rapport avec la valeur précédente. Si on considère qu'une région, par exemple d'une montagne ou le terrain
+dans un rectangle en deux dimension a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude sont aléatoires, mais dans un
 certain sens leurs quantités sont liées géographiquement. Il existe une structure spatiale sur la région.
 
 La simulation géostatistique présente plusieurs nouveaux concepts inédits dans la simulation classique. Une idée intégrale de l'étude des processus
 stochastiques spatiale est que la valeur observée est considérée comme une variable régionalisée, ce qui veut dire qu'une certain terrain
-est une réalisations d'une fonction aléatoire. Comme l'angle d'etude est fondamentalement différent de la simulation classique, on doit approcher la simulation
+est une réalisation d'une fonction aléatoire. Comme l'angle d'étude est fondamentalement différent de la simulation classique, on doit approcher la simulation
 différemment.
 
 \subsection{Cadre d'étude}
-Dans cette section nous allons vous introduire quelques nouveaux objets mathématiques qui sont souvent utilisés dans le domaine
+Dans cette section, nous allons vous introduire quelques nouveaux objets mathématiques qui sont souvent utilisés dans le domaine
 de géostatistique. Il s'agira principalement d'un \textbf{processus stochastique} $Z$, une \textbf{fonction de covariance} $C(h)$, et une \textbf{domaine $\mathcal{D}$} sur laquelle
 on peut avoir des observations.
 
@@ -662,8 +662,8 @@ $s \in \mathcal{D} = \mathbb{R}$ une profondeur $Z(s) \in \mathbb{R}$. Un autre 
 
 \subsubsection{Stationnarité}
 
-Une idée qui est super importants dans l'étude des fonctions aléatoires spatiale est l'idée de la stationnarité.la stationnarité est le concept que pour un processus stochastique,
-il existe des propriétés qui sont invariantes aux déplacements dans l'espace. Souvent classifiés sur le principe des \textit{moments statistiques}, la stationnarité nous permet de simplifier nos modèles mathématiques des
+Une idée foncdamentale dans l'étude des fonctions aléatoires spatiale est l'idée de la stationnarité. La stationnarité est un concept associé un processus stochastique,
+il existe des propriétés qui sont invariantes aux déplacements dans l'espace. Souvent classifiée sur le principe des \textit{moments statistiques}, la stationnarité nous permet de simplifier nos modèles mathématiques de
 phénomènes réels.
 
 \begin{definition}[Stationnarité à l'ordre 1]
@@ -672,7 +672,7 @@ phénomènes réels.
 \end{definition}
 
 En effet, cela nous dit qu'un processus stochastique $Z$ stationnaire à l'ordre 1 a un premier moment qui existe (traduction: si $\mathbb{E}[Z(x)] < +\infty$) et que cette espérance
-est le même partout dans l'espace $\mathcal{D}$. Cette condition impose une certaine régularité sous le processus que l'on aimerait modéliser. Au-delà, on pourrait parler de la stationnarité
+est la même partout dans l'espace $\mathcal{D}$. Cette condition impose une certaine régularité sous le processus que l'on aimerait modéliser. Au-delà, on pourrait parler de la stationnarité
 à l'ordre 2 qui impose une condition sur le deuxième moment de $Z$, la covariance :
 
 \begin{definition}[Stationnarité à l'ordre 2]
@@ -683,21 +683,21 @@ est le même partout dans l'espace $\mathcal{D}$. Cette condition impose une cer
 Une conséquence importante de cette hypothèse est que la covariance d'un processus stationnaire à l'ordre 2 ne dépend que du vecteur séparant les sites :
     $$ \mathrm{Cov}[Z(x_1), Z(x_2)] = f(x_1 - x_2) $$
 
-Cette fonction $f(x_1 - h_2)$ est souvent écrite sous la forme $C(h)$, où $h \in \mathcal{D}$ est le vecteur séparant les sites. Un modèle très souvent appliqué dans la géostatistique est la modèle exponentielle isotropique
+Cette fonction $f(x_1 - h_2)$ est souvent écrite sous la forme $C(h)$, où $h \in \mathcal{D}$ est le vecteur séparant les sites. Un modèle très souvent appliqué dans la géostatistique est le modèle exponentiel isotropique
 $$ C(h) = e^{\frac{-|h|}{a}} $$
 
-où isotropique veut dire que $C(h)$ dépend suelement de la distance $|h|$ et pas de la direction, et $a$ est un paramètre qui détermine comment la covariance diminue pour des sites lointains.
+où isotropique veut dire que $C(h)$ dépend seulement de la distance $|h|$ et pas de la direction, et $a$ est un paramètre qui détermine comment la covariance diminue pour des sites lointains.
 
 Pour éviter de trop se perdre dans la théorie, nous nous lan\c cons dans la simulation pour relier le monde des processus stochastique classique et spatiale.
 
 \subsection{Simulation spatiale}
 
 Dans ce premier exemple, on souhaite illustrer la simulation spatiale en unifiant le monde spatial avec ce que nous avons déjà vu précedemment pour la simulation des variables aléatoires,
-plus spécifiquement avec les vecteurs gaussiens. Pour rappel, pour simuler une loi gaussienne multivariée, il faut l'espérance $\vec\mu$ et la matric de covariance $\Sigma$,
-ce que est le vecteur analogue de $\mu$ et $\sigma^2$ qui décrit une loi normale en une dimension.
+plus spécifiquement avec les vecteurs gaussiens. Pour rappel, pour simuler une loi gaussienne multivariée, il faut l'espérance $\vec\mu$ et la matrice de covariance $\Sigma$,
+ce qui est le vecteur analogue de $\mu$ et $\sigma^2$ qui décrit une loi normale en une dimension.
 
 On voudrait simuler une réalisation de la variable régionalisée $Z(s), s_i \in \mathcal{D}$, $\mathcal{D} \in \mathbb{R}^2$.
-On va donc prendre une discrétisation de l'espace en une grille de $n \times n$ où les coordonnées
+On va donc discrétiser l'espace en une grille de $n \times n$ où les coordonnées
 $(i, j) \in \mathbb{R}^2$ de $s_i \in D, i \in [|1, n^2|]$ est son indice dans une matrice carrée de $n$ lignes et $n$
 colonnes remplie par les valeurs $i \in [|1, n^2|]$ par \textbf{ligne dominante}. Pour $n = 3$, il s'agit de la matrice suivante :
 $$
@@ -735,7 +735,7 @@ $$ d(s_i, s_j) = || \texttt{coord}(s_i) - \texttt{coord}(s_j)||_2 $$
 
 Par exemple, $d(s1, s5) = ||(1, 1) - (2, 2)||_2 = \sqrt{2}$.
 
-%%Maintenant, on est muni avec une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste plus qu'à faire des hypothèses sur une fonction aléatoire
+%%Maintenant, on est muni d'une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste plus qu'à faire des hypothèses sur une fonction aléatoire
 %%sur $\mathcal{D}$ si l'on veut simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, on suppose que $Z$ est un
 %%processus stationnaire à l'ordre 2. De plus, on suppose que la covariance de $Z$ suit un modèle exponentielle
 %%$$ C(h) = e^{\frac{-|h|}{a}}. $$
@@ -746,9 +746,9 @@ De plus, nous supposons que la covariance de $Z$ suit un modèle exponentiel $C(
 
 
 %%Comme on a une fonction de distance, on prend $h$ = $d(s_i, s_j)$. C'est maintenant où on relie les des côtés de simulation : On suppose que
-%%la valeur de la variable régionalisé est un vecteur gaussien avec espérance $\vec \mu$ et matrice de covariance $\Sigma$. Si on prend $\vec\mu = \textbf{0}$ il ne resete
-%%qu'à déterminer une matrice de covariance. C'est ici où on utilise la structure spatiale de notre grille et les distances entre eux pour computer une matrice
-%%de covariance et simuler un vecteur gaussien en utilisant la méthode de cholesky.
+%%la valeur de la variable régionalisée est un vecteur gaussien d'espérance $\vec \mu$ et de matrice de covariance $\Sigma$. Si on prend $\vec\mu = \textbf{0}$ il ne resete
+%%qu'à déterminer la matrice de covariance. C'est ici que l'on utilise la structure spatiale de notre grille et les distances entre elles pour computer une matrice
+%%de covariance et simuler un vecteur gaussien en utilisant la méthode de Cholesky.
 
 Puisque nous avons une fonction de distance, nous prenons $h$ = $d(s_i, s_j)$. C'est maintenant que nous connectons les deux côtés de la simulation :
 Nous supposons que la valeur de la variable régionalisée est un vecteur gaussien avec une espérance $\vec\mu$ et une matrice de covariance $\Sigma$.
@@ -865,8 +865,8 @@ $$
 \end{pmatrix}
 $$
 
-%%Comme la matrice $\Sigma$ est symmétrique, on rempli que le partie triangulaire à droite de $H$ pour la rapidité. Illustrons l'un des calculs pour qu'on comprends
-%%bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre une site fixe et \textbf{toutes} les autres sites.
+%%Comme la matrice $\Sigma$ est symétrique, on remplit d'abord la partie triangulaire droite de $H$ pour la rapiditité. Illustrons l'un des calculs pour que l'on comprenne
+%%bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre un site fixe et \textbf{toutes} les autres sites.
 %%Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple,
 
 Comme la matrice $Sigma $ est symétrique, nous ne remplissons que la partie triangulaire supérieure de $H$ Illustrons
@@ -980,13 +980,14 @@ Et enfin, la décomposition de Cholesky est de complexité $\mathcal{O}(n^3)$ ai
 
 En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions et n'est donc pas exploitable pour des grilles
 dont $n$ dépasse $100$. C'est là que nous pourrions parler d'autres méthodes comme la méthode spectrale pour simuler plus efficacement un
-champ gaussien de covariance exponentielle.
+champs gaussien de covariance exponentielle.
 
 
-\subsection{Krigeage} La dernière partie de notre projet s'oriente autour de la methode dite krigeage, qui est effectivement une union de la simulation spatiale
-avec le problème numérique des moindres carrés. Il s'agit d'interpoler à partir d'un ensemble des observations $Z(s)$ pour un certain nombre de sites $s \in \mathcal{D}$. Par exemple, on pourrait
-prendre $Z(s)$ la concentration chimique sur la surface d'une région rectangulaire. Comme il est impossible d'observer la concentration à chaque site $s \in \mathbb{R}^2$,
-on se contente d'observer la concentration en un nombre finie de site et en déduire les valeurs pour les autres sites dont la concentration est inconnue.
+\subsection{Krigeage} La dernière partie de notre projet s'oriente autour d'une méthode dite le krigeage, qui est effectivement une union de la simulation spatiale
+avec le problème numérique des moindres carrés. Il s'agit d'un ensemble des observations $Z(s)$ pour un certain nombre de sites $s \in \mathcal{D}$. Par exemple, on pourrait
+prendre $Z(s)$ la concentration d'une chimique sur la surface d'une région réctangulaire. Comme il est impossible d'observer la concentration à chaque site $s \in \mathbb{R}^2$,
+on se contente d'observer un nombre fini de mesurements et en déduire les valeurs pour les autres sites dont la concentration est inconnue.
+
 
 
 La formulation mathématique est la suivante :On commence avec un ensemble de $n$ sites $\{s_1, \dots, s_n\}$ et leurs mesures associés $Z(s_i)$, et estimer
@@ -1027,7 +1028,8 @@ $\hat Z(s)$. Sans tarder, étudions un exemple avec $\mathcal{D} = \mathbb{R}^2$
 
 \subsubsection{Réalisation du krigeage}
 
-Vu qu'on est pas munis des mesures avec lesquelles on pourrait interpoler, on va utiliser la méthode décrite dans la dernière section pour simuler un champ gaussien
+Puisque nous ne sommes pas munis des mesures avec lesquelles on pourrait interpoler, on va utiliser la méthode décrite dans la dernière section pour simuler un champ gaussien
+
 avec covariance exponentielle. Ensuite, on va échantilloner au hasard $n_{obs}$ sites et afin de réaliser l'interpolation spatiale. Commen\c cons avec une grille de 50 fois 50,
 et nous prenons $n_{obs} = 100$.
 
@@ -1121,12 +1123,13 @@ Pour le plaisir on simule deux autres instances du krigeage
        \label{fig:three graphs}
 \end{figure}
 
-Ce qui est important à retenir est que les illustrations à droites ne sont pas censées réproduire le champ à gauche avec lequel
-on est partir. Ce que le krigeage fait , comme l'interpolation polynômiale, c'est de toucher les bonnes valeurs où les mesures ont été observés puis ensuite
+Ce qui est important de retenir est le fait que les illustrations à droites ne sont pas censées reproduire le champs à gauche avec lequel
+on est parti. Ce qui fait le krigeage, comme l'interpolation polynômiale, c'est de toucher les bonnes valeurs où les mesures ont été observées puis ensuite
+
 estimer les valeurs inconnues entres les observations du sorte que l'espérance entre $\mathbb{E}[\hat Z(s) - Z(s)]$ soit minimisée. En appliquant cette stratégie envers
 un ensemble de mesures de profondeurs d'un câble sous-marin, on peut effectivement interpoler la profondeur entre les sites de mesures afin de calculer sa longueur.
 
-Malheuresement on a pas eu l'ocassion de travailler avec des données réelles, mais cela a été épanouissant d'aboutir la méthodologie spatiale.
+Malheureusement, nous n'avons pas eu l'ocassion de travailler avec des données réelles, mais cela a été épanouissant d'aboutir la méthodologie spatiale.
 
 
 \section{Programmation}
