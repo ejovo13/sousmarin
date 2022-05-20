@@ -72,6 +72,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cov_model_tent
+double cov_model_tent(const double d, double a, double sigma);
+RcppExport SEXP _sousmarin_cov_model_tent(SEXP dSEXP, SEXP aSEXP, SEXP sigmaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type d(dSEXP);
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
+    rcpp_result_gen = Rcpp::wrap(cov_model_tent(d, a, sigma));
+    return rcpp_result_gen;
+END_RCPP
+}
 // get_cov_row_exp
 NumericVector get_cov_row_exp(const int i, const int grid_nrow, const double a);
 RcppExport SEXP _sousmarin_get_cov_row_exp(SEXP iSEXP, SEXP grid_nrowSEXP, SEXP aSEXP) {
@@ -82,6 +95,48 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type grid_nrow(grid_nrowSEXP);
     Rcpp::traits::input_parameter< const double >::type a(aSEXP);
     rcpp_result_gen = Rcpp::wrap(get_cov_row_exp(i, grid_nrow, a));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_cov_row_gauss
+NumericVector get_cov_row_gauss(const int i, const int grid_nrow, const double a, const double m);
+RcppExport SEXP _sousmarin_get_cov_row_gauss(SEXP iSEXP, SEXP grid_nrowSEXP, SEXP aSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< const int >::type grid_nrow(grid_nrowSEXP);
+    Rcpp::traits::input_parameter< const double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cov_row_gauss(i, grid_nrow, a, m));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_cov_row_tent
+NumericVector get_cov_row_tent(const int i, const int grid_nrow, const double a, const double sigma);
+RcppExport SEXP _sousmarin_get_cov_row_tent(SEXP iSEXP, SEXP grid_nrowSEXP, SEXP aSEXP, SEXP sigmaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< const int >::type grid_nrow(grid_nrowSEXP);
+    Rcpp::traits::input_parameter< const double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double >::type sigma(sigmaSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cov_row_tent(i, grid_nrow, a, sigma));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_cov_row_sphere
+NumericVector get_cov_row_sphere(const int i, const int grid_nrow, const double a, const double m);
+RcppExport SEXP _sousmarin_get_cov_row_sphere(SEXP iSEXP, SEXP grid_nrowSEXP, SEXP aSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< const int >::type grid_nrow(grid_nrowSEXP);
+    Rcpp::traits::input_parameter< const double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cov_row_sphere(i, grid_nrow, a, m));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -110,6 +165,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_cov_matrix_sphere
+NumericMatrix get_cov_matrix_sphere(const int grid_nrow, const double a, const double m);
+RcppExport SEXP _sousmarin_get_cov_matrix_sphere(SEXP grid_nrowSEXP, SEXP aSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type grid_nrow(grid_nrowSEXP);
+    Rcpp::traits::input_parameter< const double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cov_matrix_sphere(grid_nrow, a, m));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_cov_matrix_tent
+NumericMatrix get_cov_matrix_tent(const int grid_nrow, const double a, const double sigma);
+RcppExport SEXP _sousmarin_get_cov_matrix_tent(SEXP grid_nrowSEXP, SEXP aSEXP, SEXP sigmaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type grid_nrow(grid_nrowSEXP);
+    Rcpp::traits::input_parameter< const double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double >::type sigma(sigmaSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_cov_matrix_tent(grid_nrow, a, sigma));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sousmarin_ind_to_coord", (DL_FUNC) &_sousmarin_ind_to_coord, 2},
@@ -117,9 +198,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sousmarin_cov_model_exp_cpp", (DL_FUNC) &_sousmarin_cov_model_exp_cpp, 2},
     {"_sousmarin_cov_model_gauss", (DL_FUNC) &_sousmarin_cov_model_gauss, 3},
     {"_sousmarin_cov_model_sphere", (DL_FUNC) &_sousmarin_cov_model_sphere, 3},
+    {"_sousmarin_cov_model_tent", (DL_FUNC) &_sousmarin_cov_model_tent, 3},
     {"_sousmarin_get_cov_row_exp", (DL_FUNC) &_sousmarin_get_cov_row_exp, 3},
+    {"_sousmarin_get_cov_row_gauss", (DL_FUNC) &_sousmarin_get_cov_row_gauss, 4},
+    {"_sousmarin_get_cov_row_tent", (DL_FUNC) &_sousmarin_get_cov_row_tent, 4},
+    {"_sousmarin_get_cov_row_sphere", (DL_FUNC) &_sousmarin_get_cov_row_sphere, 4},
     {"_sousmarin_get_cov_matrix_exp", (DL_FUNC) &_sousmarin_get_cov_matrix_exp, 2},
     {"_sousmarin_get_cov_matrix_gauss", (DL_FUNC) &_sousmarin_get_cov_matrix_gauss, 3},
+    {"_sousmarin_get_cov_matrix_sphere", (DL_FUNC) &_sousmarin_get_cov_matrix_sphere, 3},
+    {"_sousmarin_get_cov_matrix_tent", (DL_FUNC) &_sousmarin_get_cov_matrix_tent, 3},
     {NULL, NULL, 0}
 };
 

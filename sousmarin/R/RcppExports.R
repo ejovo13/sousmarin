@@ -24,8 +24,28 @@ cov_model_sphere <- function(d, a, m) {
 }
 
 #' @export
+cov_model_tent <- function(d, a, sigma) {
+    .Call(`_sousmarin_cov_model_tent`, d, a, sigma)
+}
+
+#' @export
 get_cov_row_exp <- function(i, grid_nrow, a = 2) {
     .Call(`_sousmarin_get_cov_row_exp`, i, grid_nrow, a)
+}
+
+#' @export
+get_cov_row_gauss <- function(i, grid_nrow, a = 2, m = 1) {
+    .Call(`_sousmarin_get_cov_row_gauss`, i, grid_nrow, a, m)
+}
+
+#' @export
+get_cov_row_tent <- function(i, grid_nrow, a = 2, sigma = 1) {
+    .Call(`_sousmarin_get_cov_row_tent`, i, grid_nrow, a, sigma)
+}
+
+#' @export
+get_cov_row_sphere <- function(i, grid_nrow, a = 2, m = 1) {
+    .Call(`_sousmarin_get_cov_row_sphere`, i, grid_nrow, a, m)
 }
 
 #' @export
@@ -36,5 +56,15 @@ get_cov_matrix_exp <- function(grid_nrow, a = 2) {
 #' @export
 get_cov_matrix_gauss <- function(grid_nrow, a = 2, m = 1) {
     .Call(`_sousmarin_get_cov_matrix_gauss`, grid_nrow, a, m)
+}
+
+#' @export
+get_cov_matrix_sphere <- function(grid_nrow, a = 2, m = 1) {
+    .Call(`_sousmarin_get_cov_matrix_sphere`, grid_nrow, a, m)
+}
+
+#' @export
+get_cov_matrix_tent <- function(grid_nrow, a = 2, sigma = 1) {
+    .Call(`_sousmarin_get_cov_matrix_tent`, grid_nrow, a, sigma)
 }
 
