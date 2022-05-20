@@ -639,14 +639,14 @@ Par conséquent, le vecteur aléatoire Z possède la matrice de covariance souha
 \subsection{Motivation}
 
 Le monde de simulation classique opère sous l'hypothèse d'indépendance des réalisations successives. C'est-à-dire que le prochain
-valeur échantillonné n'a aucun rapport avec la valeur précédente. Si on considere qu'une région par exemple d'une montaigne où le terrain
-dans un rectangle 2 dimensionnel a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude son aléotoire, mais dans un
+valeur échantillonnée n'a aucun rapport avec la valeur précédente. Si on considère qu'une région par exemple d'une montagne ou le terrain
+dans un rectangle 2 dimensionnel a une certaine altitude, on peut imaginer que les \textit{valeurs} de l'altitude son aléatoires, mais dans un
 certain sens leurs quantités sont liées géographiquement. Il existe une structure spatiale sur la région.
 
-La simulation géostatistique présente plusiers nouveaux conceptes inédits dans la simulation classique. Une idée intégrale de l'étude des processus
-stochastique spatiale c'est que la valeur observée est considerée une variable régionalisée, ce qui veut dire qu'une certain terrain
-est une réalisations d'une fonction aléatoire. Comme l'angle d'etude est fondamentalement différent que la simulation classique, on doit approcher la simulation
-différamment.
+La simulation géostatistique présente plusieurs nouveaux concepts inédits dans la simulation classique. Une idée intégrale de l'étude des processus
+stochastiques spatiale est que la valeur observée est considérée comme une variable régionalisée, ce qui veut dire qu'une certain terrain
+est une réalisations d'une fonction aléatoire. Comme l'angle d'etude est fondamentalement différent de la simulation classique, on doit approcher la simulation
+différemment.
 
 \subsection{Cadre d'étude}
 Dans cette section nous allons vous introduire quelques nouveaux objets mathématiques qui sont souvent utilisés dans le domaine
@@ -659,16 +659,16 @@ on peut avoir des observations.
     $$ Z : \mathcal{D} \times \Omega \to \mathbb{R} $$
 \end{definition}
 
-On aimerait utiliser cette définition pour modéliser la configuration spatiale d'un câble sous-marin en tant qu'une réalisation d'un processus stochastique.
-Dans ce cas, on peut imaginer qu'à chaque endroit du câble il y a une profondeur associé. Par exemple, à 100m le câble pourrait avoir une profondeur de 3.7km. On peut donc
+On aimerait utiliser cette définition pour modéliser la configuration spatiale d'un câble sous-marin en tant que réalisation d'un processus stochastique.
+Dans ce cas, on peut imaginer qu'à chaque endroit du câble il y a une profondeur associée. Par exemple, à 100m le câble pourrait avoir une profondeur de 3.7km. On peut donc
 considérer que la configuration spatiale d'un câble sous-marin est une fonction aléatoire qui, pour une éventualité $\omega \in \Omega$ donnée, associe à chaque position
 $s \in \mathcal{D} = \mathbb{R}$ une profondeur $Z(s) \in \mathbb{R}$. Un autre exemple d'un processus stochastique pourrait être la quantité de précipitation sur l'année dans une région fixe. Dans ce cas-là, on prendra $\mathcal{D} = \mathbb{R}^2$.
 
 \subsubsection{Stationnarité}
 
-Une idée qui est super important dans l'étude des fonctions aléatoires spatiales est l'idée de la stationnarité. Grosso modo, la stationnarité est le concepte que pour un processus stochastique,
-il existe des propriétés qui sont invariants au déplacements dans l'espace. Souvent classifiés sur le principe des \textit{moments statistiques}, la stationnarité nous permet de simplifier nos modèles mathématiqes des
-phenomènes réelles.
+Une idée qui est super-importants dans l'étude des fonctions aléatoires spatiale est l'idée de la stationnarité.la stationnarité est le concept que pour un processus stochastique,
+il existe des propriétés qui sont invariantes aux déplacements dans l'espace. Souvent classifiés sur le principe des \textit{moments statistiques}, la stationnarité nous permet de simplifier nos modèles mathématiques des
+phénomènes réels.
 
 \begin{definition}[Stationnarité à l'ordre 1]
     Un processus stochastique est qualifié de \textbf{stationnaire à l'ordre 1} si et seulement si le premier moment existe et est invariant par translation $h \in D$ :
@@ -676,7 +676,7 @@ phenomènes réelles.
 \end{definition}
 
 En effet, cela nous dit qu'un processus stochastique $Z$ stationnaire à l'ordre 1 a un premier moment qui existe (traduction: si $\mathbb{E}[Z(x)] < +\infty$) et que cette espérance
-est le même partout dans l'espace $\mathcal{D}$. Cette condition impose une certaine régularité sous le processus que l'on aimerait modéliser. Au-dela, on pourrait parler de la stationnarité
+est le même partout dans l'espace $\mathcal{D}$. Cette condition impose une certaine régularité sous le processus que l'on aimerait modéliser. Au-delà, on pourrait parler de la stationnarité
 à l'ordre 2 qui impose une condition sur le deuxième moment de $Z$, la covariance :
 
 \begin{definition}[Stationnarité à l'ordre 2]
@@ -684,26 +684,26 @@ est le même partout dans l'espace $\mathcal{D}$. Cette condition impose une cer
     $$ \mathrm{Cov}[Z(x_1), Z(x_2)] = \mathrm{Cov}[Z(x_1 + h, x_2 + h)]$$.
 \end{definition}
 
-Une conséquence importante de cette hypothèse cést que la covariance d'un processus stationnaire à l'ordre 2 ne dépend que du vecteur séparant les sites :
+Une conséquence importante de cette hypothèse est que la covariance d'un processus stationnaire à l'ordre 2 ne dépend que du vecteur séparant les sites :
     $$ \mathrm{Cov}[Z(x_1), Z(x_2)] = f(x_1 - x_2) $$
 
 Cette fonction $f(x_1 - h_2)$ est souvent écrite sous la forme $C(h)$, où $h \in \mathcal{D}$ est le vecteur séparant les sites. Un modèle très souvent appliqué dans la géostatistique est la modèle exponentielle isotropique
 $$ C(h) = e^{\frac{-|h|}{a}} $$
 
-où isotropique veut dire que $C(h)$ dépend suelement sur la distance $|h|$ et pas la direction, et $a$ est un paramètre qui détermine comment la covariance diminue pour des sites lointaines.
+où isotropique veut dire que $C(h)$ dépend suelement de la distance $|h|$ et pas de la direction, et $a$ est un paramètre qui détermine comment la covariance diminue pour des sites lointains.
 
 Pour éviter de trop se perdre dans la théorie, nous nous lan\c cons dans la simulation pour relier le monde des processus stochastique classique et spatiale.
 
 \subsection{Simulation spatiale}
 
-Dans ce premier exemple, on souhaite illustrer la simulation spatiale en unifiant le monde spatialece avec ce que nous avons déjà vu précedamment pour la simulation,
-spécifiquement avec le vecteur gaussien. Pour rappel, pour simuler une loi gaussienne multivariée, il faut l'espérance $\vec\mu$ et la matric de covariance $\Sigma$,
+Dans ce premier exemple, on souhaite illustrer la simulation spatiale en unifiant le monde spatial avec ce que nous avons déjà vu précedemment pour la simulation des variables aléatoires,
+plus spécifiquement avec les vecteurs gaussiens. Pour rappel, pour simuler une loi gaussienne multivariée, il faut l'espérance $\vec\mu$ et la matric de covariance $\Sigma$,
 ce que est le vecteur analogue de $\mu$ et $\sigma^2$ qui décrit une loi normale en une dimension.
 
-On voudrait simuler une réalisation de la variable régionalisé $Z(s), s_i \in \mathcal{D}$, $\mathcal{D} \in \mathbb{R}^2$.
-On va donc prendre une discretization de l'espace en un grille de $n \times n$ où les coordonnées
+On voudrait simuler une réalisation de la variable régionalisée $Z(s), s_i \in \mathcal{D}$, $\mathcal{D} \in \mathbb{R}^2$.
+On va donc prendre une discrétisation de l'espace en une grille de $n \times n$ où les coordonnées
 $(i, j) \in \mathbb{R}^2$ de $s_i \in D, i \in [|1, n^2|]$ est son indice dans une matrice carrée de $n$ lignes et $n$
-colonnes remplie par les valeurs $i \in [|1, n^2|]$ par \textbf{ligne dominante}. Pour $n = 3$, il s'agit de la matrice suivant :
+colonnes remplie par les valeurs $i \in [|1, n^2|]$ par \textbf{ligne dominante}. Pour $n = 3$, il s'agit de la matrice suivante :
 $$
     \begin{pmatrix}
         s_1 & s_2 & s_3 \\
@@ -739,14 +739,26 @@ $$ d(s_i, s_j) = || \texttt{coord}(s_i) - \texttt{coord}(s_j)||_2 $$
 
 Par exemple, $d(s1, s5) = ||(1, 1) - (2, 2)||_2 = \sqrt{2}$.
 
-Maintenants, on est muni avec une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste qu'à faire des hypothèse sur une fonction
-aléatoire sur $\mathcal{D}$ si on voudrait simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, on suppose que $Z$ est un
-processus stationnaire à l'ordre 2. De plus, on suppose que la covariance de $Z$ suit une modèle exponentielle
-$$ C(h) = e^{\frac{-|h|}{a}}. $$
-Comme on a une fonction de distance, on prend $h$ = $d(s_i, s_j)$. C'est maintenant où on relie les des côtés de simulation : On suppose que
-la valeur de la variable régionalisé est un vecteur gaussien avec espérance $\vec \mu$ et matrice de covariance $\Sigma$. Si on prend $\vec\mu = \textbf{0}$ il ne resete
-qu'à déterminer une matrice de covariance. C'est ici où on utilise la structure spatiale de notre grille et les distances entre eux pour computer une matrice
-de covariance et simuler un vecteur gaussien en utilisant la méthode de cholesky.
+%%Maintenant, on est muni avec une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste plus qu'à faire des hypothèses sur une fonction aléatoire
+%%sur $\mathcal{D}$ si l'on veut simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, on suppose que $Z$ est un
+%%processus stationnaire à l'ordre 2. De plus, on suppose que la covariance de $Z$ suit un modèle exponentielle
+%%$$ C(h) = e^{\frac{-|h|}{a}}. $$
+
+Maintenant, nous sommes équipés d'une notion de distance entre $s_i, s_j \in \mathcal{D}$. Il ne reste plus qu'à faire des hypothèses sur une fonction aléatoire 
+sur $\mathcal{D}$ si l'on veut simuler une réalisation $\omega \in \Omega$ de $Z$. Pour commencer, nous supposons que $Z$ est un processus stationnaire d'ordre 2. 
+De plus, nous supposons que la covariance de $Z$ suit un modèle exponentiel C(h) = e^{frac{-|h|}{a}}.
+
+
+%%Comme on a une fonction de distance, on prend $h$ = $d(s_i, s_j)$. C'est maintenant où on relie les des côtés de simulation : On suppose que
+%%la valeur de la variable régionalisé est un vecteur gaussien avec espérance $\vec \mu$ et matrice de covariance $\Sigma$. Si on prend $\vec\mu = \textbf{0}$ il ne resete
+%%qu'à déterminer une matrice de covariance. C'est ici où on utilise la structure spatiale de notre grille et les distances entre eux pour computer une matrice
+%%de covariance et simuler un vecteur gaussien en utilisant la méthode de cholesky.
+
+Puisque nous avons une fonction de distance, nous prenons $h$ = $d(s_i, s_j)$. C'est maintenant que nous connectons les deux côtés de la simulation : 
+Nous supposons que la valeur de la variable régionalisée est un vecteur gaussien avec une espérance $\vec\mu$ et une matrice de covariance $\Sigma$. 
+Si nous prenons $\vec\mu = \textbf{0}$ il ne reste plus qu'à déterminer une matrice de covariance. C'est ici que nous utilisons la structure spatiale 
+de notre grille et les distances entre elles pour calculer une matrice de covariance et simuler un vecteur gaussien en utilisant la méthode de Cholesky.
+
 
 Le fait qu'on suppose que $Z$ est stationnaire à l'ordre 2 (au premier moment aussi) nous permet d'avoir une covariance à partir d'une distance. On prend un moment pour vous illustrer
 quelques simulations de ce sort avant de détailler la méthodologie au niveau algorithmique.
@@ -805,10 +817,15 @@ quelques simulations de ce sort avant de détailler la méthodologie au niveau a
 
 \subsubsection{Méthodologie}
 
-Reprenons l'exemple d'une grille de $3$ lignes et $3$ colonnes. Pour simuler une réalisation de la fonction aléatoire $Z$, on procède en simulant
-un vecteur gaussien de $9$ éléments, dont la matrice de covariance $\Sigma$ est déterminé par l'hypothèse de stationnarité forte (à l'ordre 1 et 2) et
-calculé selon un modèle choisit. Nous utiliserons le modèle exponentielle pour commencer. Finalement, pour simplifier l'exemple on prend une espérance
-$\mu = \textbf{0} \in \mathbb{R}^9$.
+%%Reprenons l'exemple d'une grille de $3$ lignes et $3$ colonnes. Pour simuler une réalisation de la fonction aléatoire $Z$, on procède en simulant
+%%un vecteur gaussien de $9$ éléments, dont la matrice de covariance $\Sigma$ est déterminé par l'hypothèse de stationnarité forte (à l'ordre 1 et 2) et
+%%calculé selon un modèle choisit. Nous utiliserons le modèle exponentielle pour commencer. Finalement, pour simplifier l'exemple on prend une espérance
+%%$\mu = \textbf{0} \in \mathbb{R}^9$.
+
+Prenons l'exemple d'une grille de $3$ lignes et $3$ colonnes. Pour simuler une réalisation de la fonction aléatoire $Z$ nous procédons à 
+la simulation d'un vecteur gaussien de $9$ éléments, dont la matrice de covariance $\Sigma$est déterminée par l'hypothèse de stationnarité 
+forte (aux ordres 1 et 2) et calculée selon un modèle choisi. Nous utiliserons le modèle exponentiel pour commencer. Enfin, pour simplifier 
+l'exemple, nous prenons une espérance $\mu = \textbf{0} \in \mathbb{R}^9$.
 
 Pour simuler un vecteur gaussien dans $\mathbb{R}^9$, on a besoin d'une matrice de covariance de $9$ lignes et $9$ colonnes :
 $$
@@ -848,17 +865,31 @@ $$
 \end{pmatrix}
 $$
 
-Comme la matrice $\Sigma$ est symmétrique, on rempli que le partie triangulaire à droite de $H$ pour breveté. Illustrons l'un des calculs pour qu'on comprends
-bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre une site fixe et \textbf{toutes} les autres sites.
-Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple,
+%%Comme la matrice $\Sigma$ est symmétrique, on rempli que le partie triangulaire à droite de $H$ pour la rapidité. Illustrons l'un des calculs pour qu'on comprends
+%%bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre une site fixe et \textbf{toutes} les autres sites.
+%%Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple,
+
+Comme la matrice $Sigma $ est symétrique, nous ne remplissons que la partie triangulaire supérieure de $H$ Illustrons 
+un des calculs pour bien comprendre ce que nous venons de calculer. Pour chaque ligne, nous souhaitons calculer la covariance
+entre un site fixe et \textbf{tous} les autres sites. Pour la première ligne, nous avons calculé les distances entre
+$s_1$ et $s_i \in \{s_1, \dots, s_9\}$.Par exemple,
+
+
 \begin{align*}
     H_{1, 1} &= d(s_1, s_1) = ||(1, 1) - (1, 1)||_2 = 0 \\
     H_{1, 2} &= d(s_1, s_2) = ||(1, 1) - (1, 2)||_2 = 1 \\
     H_{1, 6} &= d(s_1, s_6) = ||(1, 1) - (2, 3)||_2 = \sqrt{5}.
 \end{align*}
 
-Une dernière étape c'est d'appliquer le modèle de covariance exponentielle $C(h; a) = \exp(\frac{-|h|}{a})$ pour tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est implémenté par la fonction
-\texttt{get\_cov\_matrix\_exp(n, a)} pour une grille de $n$ lignes et $n$ colonnes. Pour notre exemple, on appelle \texttt{get\_cov\_matrix\_exp(3, 1)}.
+%%Une dernière étape c'est d'appliquer le modèle de covariance exponentielle $C(h; a) = \exp(\frac{-|h|}{a})$ 
+%%pour tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est implémenté par la fonction
+%%\texttt{get\_cov\_matrix\_exp(n, a)} pour une grille de $n$ lignes et $n$ colonnes. 
+%%Pour notre exemple, on appelle \texttt{get\_cov\_matrix\_exp(3, 1)}.
+
+Une dernière étape consiste à appliquer le modèle de covariance exponentielle $C(h ; a) = \exp(\frac{-|h|}{a})$ pour
+tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est mis en œuvre par la fonction \texttt{get\_cov\_matrix_exp(n, a)}
+pour une grille de $n$ lignes et $n$ colonnes. Dans notre exemple, nous appelons la fonction \texttt{get\_cov\_matrix_exp(3, 1)}.
+
 
 $$
 \Sigma = C(H; 1) =
@@ -875,7 +906,9 @@ $$
 \end{pmatrix}
 $$
 
-On pourrait appliquer des autres modèles de covariance pour changer la dépendance spatiale de notre fonction aléatoire:
+%%On pourrait appliquer des autres modèles de covariance pour changer la dépendance spatiale de notre fonction aléatoire:
+
+Nous pourrions appliquer d'autres modèles de covariance pour modifier la dépendance spatiale de notre fonction aléatoire :
 
 \begin{itemize}
     \item[] Modèle de tente :
@@ -919,8 +952,11 @@ On pourrait appliquer des autres modèles de covariance pour changer la dépenda
 
 \end{itemize}
 
-Maintenant on appelle notre fonction \texttt{rmvnorm} pour simuler un vecteur gaussien dans $\mathbb{R}^9$ avec espérance $0$ et
-matrice de covariance $\Sigma = C(H; a)$ suivant un modèle exponentiel avec $a = 3$.
+%%Maintenant on appelle notre fonction \texttt{rmvnorm} pour simuler un vecteur gaussien dans $\mathbb{R}^9$ avec espérance $0$ et
+%%matrice de covariance $\Sigma = C(H; a)$ suivant un modèle exponentiel avec $a = 3$.
+
+Nous appelons maintenant notre fonction \texttt{rmvnorm} pour simuler un vecteur gaussien dans $\mathbb{R}^9$ avec une espérance $0$ et
+une matrice de covariance $\Sigma = C(H ; a)$ suivant un modèle exponentiel avec $a = 3$.
 
 \begin{figure}[h!]
     \centering
@@ -929,12 +965,21 @@ matrice de covariance $\Sigma = C(H; a)$ suivant un modèle exponentiel avec $a 
     de couleur \texttt{viridis}.}
 \end{figure}
 
-Pour élucider plus de structure, on fait augmenter la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$ lignes et $n^2$ colonnes pour une grille $n$ fois $n$, le nombre d'opérations juste pour
-calculer $\Sigma$ est de complexité $\mathcal{O}(n^4)$! Et finalement la décomposition de Cholesky est de compléxité $\mathcal{O}(n^3)$ ainsi que la multiplication matricielle.
+%%Pour élucider plus de structure, on fait augmenter la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$ lignes et $n^2$ colonnes pour une grille $n$ fois $n$, le nombre d'opérations juste pour
+%%calculer $\Sigma$ est de complexité $\mathcal{O}(n^4)$! Et finalement la décomposition de Cholesky est de compléxité $\mathcal{O}(n^3)$ ainsi que la multiplication matricielle.
 
-En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions donc elle n'est pas traitable pour des grilles dont $n$
-dépasse $100$. C'est ici où on pourrait parler des autre méthodes telle que la méthode spectrale pour simuler plus efficacement un champ gaussien de covariance
-exponentielle.
+Pour élucider plus de structures, nous augmentons la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$ 
+ligne et $n^2$ colonne pour une grille $n$ fois $n$le nombre d'opérations droites pour calculer $\Sigma$est de complexité $\mate cal{O}(n^4)$ .
+Et enfin, la décomposition de Cholesky est de complexité $\mate cal{O}(n^3)$ ainsi que la multiplication de la matrice.
+
+%%En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions donc elle n'est pas traitable pour des grilles dont $n$
+%%dépasse $100$. C'est ici où on pourrait parler des autre méthodes telle que la méthode spectrale pour simuler plus efficacement un champ gaussien de covariance
+%%exponentielle.
+
+En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions et n'est donc pas exploitable pour des grilles 
+dont $n$ dépasse $100$. C'est là que nous pourrions parler d'autres méthodes comme la méthode spectrale pour simuler plus efficacement un 
+champ gaussien de covariance exponentielle.
+
 
 \subsection{Krigeage} La dernière partie de notre projet s'oriente autour d'une méthode dite le krigéage, qui est effectivement une union de la simulation spatiale
 avec le problème numérique des moindres carrés.
