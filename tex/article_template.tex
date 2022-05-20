@@ -937,7 +937,152 @@ dépasse $100$. C'est ici où on pourrait parler des autre méthodes telle que l
 exponentielle.
 
 \subsection{Krigeage} La dernière partie de notre projet s'oriente autour d'une méthode dite le krigéage, qui est effectivement une union de la simulation spatiale
-avec le problème numérique des moindres carrés.
+avec le problème numérique des moindres carrés. Il s'agit d'un ensemble des observations $Z(s)$ pour un certain nombre de sites $s \in \mathcal{D}$. Par exemple, on pourrait
+prendre $Z(s)$ la concentration d'une chimique sur la surface d'une région réctangulaire. Comme il est impossible d'observer la concentration à chaque site $s \in \mathbb{R}^2$,
+on se contente d'observer un nombre fini de mesurements et en déduire les valeurs pour les autres sites dont la concentration est inconnue.
+
+    Commencer avec un petit nombre de mesurements et en déduire le reste? Bien sûr qu'il s'agit d'un problème d'interpolation!
+
+La formulation mathématique est la suivante : Donnée un ensemble de $n$ sites $\{s_1, \dots, s_n\}$ et leurs mesurements associés $Z(s_i)$, estimer
+$\hat Z(s)$ pour tout $s \in \mathcal{D}$. La théorie c'est de construire un estimateur $\hat Z$ qui est exacte, c'est-à-dire que $\hat Z(s_i) = Z(s_i)$ pour
+tout $s_i$ appartenant à l'ensemble des \textbf{observations}, et qui est formé d'une combinaison linéaire des observations connues :
+$$ \hat Z(s) =  \sum \lambda_i Z(s_i).$$
+
+Avec cette formulation, l'interpolation de krigeage se base sur la résolution d'un système linéaire dont
+\begin{enumerate}
+    \item Les poids $\lambda_i$ dépendent de $s$, le site que l'on souhaite estimer
+    \item Le système à résoudre est gouverné pas la structure spatiale du modèle, la fonction de covariance $C(h)$.
+\end{enumerate}
+
+Avec cela en tête, on écrit le système à résoudre pour trouver les poids $\lambda_i$ au site $s$ que l'on voudrait estimer.
+\begin{equation}
+\begin{pmatrix}
+    \text{Cov}[s_1, s_1] & \cdots & \text{Cov}[s_1, s_n] \\
+    \vdots & \ddots & \vdots \\
+    \text{Cov}[s_n, s_1] & \cdots & \text{Cov}[s_n, s_n] \\
+\end{pmatrix}
+\begin{pmatrix}
+    \lambda_1 \\
+    \vdots \\
+    \lambda_n
+\end{pmatrix}
+=
+\begin{pmatrix}
+    \text{Cov}[s, s_1] \\
+    \vdots \\
+    \text{Cov}[s, s_n]
+\end{pmatrix}
+\end{equation}
+
+Il est intéressant à remarquer que pour chaque $s \in \mathcal{D}$ dont on aimerait estimer $\hat Z(s)$, le système d'équations à résoudre de dépend
+\textbf{pas} des valeurs observés $Z(s_i)$! Cela veut dire que l'importance de $Z(s_i)$ contribuant pour le calcul final $\hat Z(s_i)$, c'est-à-dire les poids $\lambda_i$, ne dépend \textbf{que}
+sur la configuration spatiale des données. Le modèle de covariance utilisé détermine la valeur de chaque poids qui en revanche determinent la valeur de l'estimateur
+$\hat Z(s)$. Sans tarder, étudierons un exemple avec $\mathcal{D} = \mathbb{R}^2$.
+
+\subsubsection{Réalisation du krigeage}
+
+Vu qu'on est pas munis des mesurements avec lesquelles on pourrait interpoler, on va utiliser la méthode décrite dans la dernière section pour simuler un champ gaussien
+avec covariance exponentielle. Ensuite, on va échantilloner au hasard $n_{obs}$ sites et afin de réaliser l'interpolation spatiale. Commen\c cons avec une grille de 50 fois 50,
+et nous prenons $n_{obs} = 100$.
+
+Après la réalisation d'un champ gaussien, on va calculer $\hat Z(s)$ pour toute site dans notre grille, en résoulant un système d'équations \textbf{unique} pour chaque $s \in \mathcal{D}$, après
+lequel on calcule la somme $$ \hat Z(s) =  \sum \lambda_i Z(s_i).$$
+\newpage
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_field_start.png}
+        \caption{}
+        \label{gauss plasma}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_field_observations.png}
+        \caption{}
+        \label{fig:three sin x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_interp.png}
+        \caption{}
+        \label{fig:five over x}
+    \end{subfigure}
+       \caption{A gauche (a) on simule un champ gaussien avec une modèle de covariance exponentiel. En (b) on choisit aléatoirement 100 sites pour être nos
+       observations. Pour (c) on résoud le problème de moindres carrés à \textbf{chaque site} pour calculer les $\lambda_i(s)$ utilisés dans le calcul final
+       de l'estimateur $\hat Z$.}
+       \label{fig:three graphs}
+\end{figure}
+
+Pour le plaisir on simule deux autres instances du krigeage
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_champ_1.png}
+        % \caption{}
+        \label{gauss plasma}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_sites_1.png}
+        % \caption{}
+        \label{fig:three sin x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_inter_1.png}
+        % \caption{}
+        \label{fig:five over x}
+    \end{subfigure}
+    %    \caption{A gauche (a) on simule un champ gaussien avec une modèle de covariance exponentiel. En (b) on choisit aléatoirement 100 sites pour être nos
+    %    observations. Pour (c) on résoud le problème de moindres carrés à \textbf{chaque site} pour calculer les $\lambda_i(s)$ utilisés dans le calcul final
+    %    de l'estimateur $\hat Z$.}
+       \label{fig:three graphs}
+\end{figure}
+\vspace{-1.5cm}
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_champ_2.png}
+        % \caption{}
+        \label{gauss plasma}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_sites_2.png}
+        % \caption{}
+        \label{fig:three sin x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_inter_2.png}
+        % \caption{}
+        \label{fig:five over x}
+    \end{subfigure}
+    %    \caption{A gauche (a) on simule un champ gaussien avec une modèle de covariance exponentiel. En (b) on choisit aléatoirement 100 sites pour être nos
+    %    observations. Pour (c) on résoud le problème de moindres carrés à \textbf{chaque site} pour calculer les $\lambda_i(s)$ utilisés dans le calcul final
+    %    de l'estimateur $\hat Z$.}
+       \label{fig:three graphs}
+\end{figure}
+
+Ce qui est important à retenir c'est que les illustrations à droites ne sont pas censées à réproduire le champ à gauche avec lequel
+on est partir. Ce qui fait le krigeage, comme l'interpolation polynômiale, c'est de toucher les bonnes valeurs où les mesurements ont été observés puis ensuite
+estimer les valeurs inconnues entres les observations du sorte que l'espérance entre $\mathbb{E}[\hat Z(s) - Z(s)]$ soit minimisée. En appliquant cette stratégie envers
+un ensemble des mesurements de profondeurs d'un câble sous-marin, on peut effectivement interpoler la profondeur entre les sites de mesurements afin de calculer sa longueur.
+
+Malheuresement on a pas eu l'ocassion de travailler avec des données réelles, mais cela a été épanouissant d'aboutir la méthodologie spatiale.
+
 
 \section{Programmation}
 \subsection{R shiny}
@@ -989,21 +1134,15 @@ avec le package \texttt{Rcpp} qui permet la compilation de code source en \textt
 spatiale ont été réecrites en \texttt{C++} comme les boucles sont très lentes en \texttt{R}. Avant la réécriture, la fonction \texttt{get\_cov\_mat\_exp} mettait environ une minute pour simuler une grille
 de dimension $60$ x $60$. Après l'implémentation en \texttt{C++} et nous avons réussi à effectuer une réalisation de $100$ x $100$ en moins de 10 secondes.
 
-\section{Conclusion}
-
-Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation mutlivariée et en spatial.
-%%Pour cela nous avons utilisé les méthode de
-
-Il y a plusieurs choses que nous aurions pu amélorier au cours du projet.
-Tout d'abord, les boucles en R sont plutôt lentes. Pour la suite, nous aurions pu implémenter les fonctions en C en utilisant le package Rcpp. Pour suivre, nous aurions tenter d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
-de modifier l'état du générateur en même temps.
+Toutes les fonctions utilisés pour les simulations font partie du package \texttt{sousmarin} et se trouve dans les répertoires \texttt{sousmarin/R} et \texttt{sousmarin/src}. Le code pour générer
+les plots dans ce rapport se trouve sous le dossier \texttt{tex} du répo github.
 
 \section{Conclusion}
 
 Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant
 uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes
  d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation
- mutlivariée et en spatial. Pour cela nous avons utilisé les méthode de de krigeage et éventuellement
+ mutlivariée et en spatial. Pour cela nous avons utilisé les méthode  de krigeage et éventuellement
  nous allons voir si nous pouvons implémenter la méthode spectrale pour simuler des processus gaussiens
 
 \section{Ce que nous pourrions amélirorer}
@@ -1011,7 +1150,21 @@ uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé l
 
 Les boucles en R sont péniblement lentes comparé aux autre languages compilés comme le C. Donc, la plupart de nos algorithmes implémentés sont
 centaines des fois plus lentes que les fonctions de base en R telles que \texttt{runif}, \texttt{rexp}, etc. Si on avait plus de temps,
-on aurait aimé implémenter les fonctions en C en utilisant le package Rcpp qui permet d'écrire notre propre code en C/C++ à executer sous R.
+on aurait aimé implémenter les fonctions en C en utilisant le package Rcpp qui permet d'écrire notre propre code en C/C++ à executer sous R. Déjà on a pu implémenter
+quelques fonctions problématiques en \texttt{C++} telles que calculer la matrice de covariance pour la simulation spatiale.
+
+\subsection{Données}
+
+On aurait aimé travaillé avec des données réelles afin de vraiment calculer la longuer d'un câble sous-marin. Cependant, on se contentait de
+générer notre propre champ gaussien pour travailler la méthode de krigeage.
+
+\subsection{Méthode spectrale}
+
+La seule méthode de simulation qu'on avait visé mais que l'on a pas réussi à implémenter c'était la méthode spectrale.
+Nommée spectrale pour ses liens avec l'analyse Fourier et sa méthodologie qui utilise des fonctions de base afin de simuler
+un champ gaussien, cette méthode permet de simuler un vecteur gaussien d'un très grand dimension sans être frappé par la malédiction
+de dimension.
+
 \section{Réflexions}
 
 \renewcommand {\epigraphflush} {flushleft}
