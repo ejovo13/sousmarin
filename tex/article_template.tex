@@ -301,7 +301,6 @@ On obtient alors le graphique suivant qui montre que les moyennes empiriques cal
 \begin{figure}[h!]
     \centering
     \include{plots/Rplot03.tex}
-
     \vspace{-1cm}
    \caption{Histogramme généré à partir d'un appel à \texttt{r\_std\_unif} avec $n = 1000000$. On initialise la graine de notre
     générateur avec un appel à \texttt{set\_seed(0)}.}
@@ -529,7 +528,37 @@ Remarque : Pour simuler $Z \sim N (\mu, \sigma^2 ),$ on simule $X \sim N (0, 1)$
 
  $$Z = \mu + \sigma X$$
 
+ \subsection{Vecteur Gaussien}
+ Maintenant que nous savons simuler des variables aléatoires gaussiennes, nous allons nous intéresser à la simulation d’un
+ vecteur aléatoire gaussien $X = (X_1, ... ,X_d) \sim \mathcal{N}(\mu , \sigma)$,  $d \in  N^*$, avec \
+            $$ \mu = E[X] = (E[X_1], ... ,E[X_d])^T \in \mathbb{R}^d $$ \
+     et \
+             $$\Sigma = E[XX^T] - E[x](E[X])^T $$ \
+ $\Sigma$ est appelée la matrice de variance (ou matrice de variance-covariance) de X. C’est une matrice de taille d × d qui est semi-définie positive.
 
+ \subsubsection{Simulation à l'aide de la méthode de factorisation de cholesky}
+
+ De manière générale, un vecteur gaussien X se simule par transformation affine de
+ variables aléatoires gaussiennes centrées réduites indépendantes Z.
+
+ Pour générer X nous allons suivre cet algorithme:\
+
+ 1. Générer $Z_1, ... Z_n \sim \mathcal{N}(0 , 1)$ et $Z = (Z_1,...,Z_n)^T$.
+
+ 2. Dériver la décomposition Cholesky de $\Sigma$ = $\textbf{LL}^T$.
+
+ 3. Retourner $X = \mu + L\textbf{Z}$
+
+
+ l'algorithme est simple à implémenter, la première étape consiste juste à générer des variables aléatoires qui suivent une loi normale centrée réduite et qui ne sont pas corrélées. Ensuite nous faisons une décomposition de Cholesky de la matrice de covariance selon laquelle nous voulons faire la simulation de vecteurs gaussiens,la fonction de R {\it chol()} est utilisé pour la décomposition. Après la décomposition nous obtenons une matrice triangulaire inférieure \textbf{L} .
+ Finalement la transformation affine de l'étape 3 nous permet d'avoir une vecteur gaussien avec la bonne ésperance et matrice de covariance.
+
+ \
+ \underline{Exemple:En deux dimension}:
+
+
+ \
+ \underline{Preuve}:
 
 
 
@@ -650,6 +679,59 @@ de covariance et simuler un vecteur gaussien en utilisant la méthode de cholesk
 Le fait qu'on suppose que $Z$ est stationnaire à l'ordre 2 (au premier moment aussi) nous permet d'avoir une covariance à partir d'une distance. On prend un moment pour vous illustrer
 quelques simulations de ce sort avant de détailler la méthodologie au niveau algorithmique.
 
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_plasma.png}
+        \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
+        \label{gauss plasma}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/tent.png}
+        \caption{Tent}
+        \label{fig:three sin x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/exp6_1.png}
+        \caption{}
+        \label{fig:five over x}
+    \end{subfigure}
+       \caption{Three simple graphs}
+       \label{fig:three graphs}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/gauss_2.7_1_1.png}
+        \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
+        \label{gauss plasma}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/sphere.png}
+        \caption{Sphere}
+        \label{fig:three sin x}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/exp_2.png}
+        \caption{}
+        \label{fig:five over x}
+    \end{subfigure}
+       \caption{Three simple graphs}
+       \label{fig:three graphs}
+\end{figure}
+
+
 \section{R shiny}
 
 Pour faire la simulation sans passer par du code R, nous avons créé une interface web afin de récupérer les variables simulées.
@@ -681,8 +763,72 @@ Il y a plusieurs choses que nous aurions pu amélorier au cours du projet.
 Tout d'abord, les boucles en R sont plutôt lentes. Pour la suite, nous aurions pu implémenter les fonctions en C en utilisant le package Rcpp. Pour suivre, nous aurions tenter d'explorer d'autres optimisations au niveau de la parallélisation. Ces améliorations nous donneront d'autres problèmes à résoudre tels que les conditions de courses - quand deux "threads" essaient d'accéder et
 de modifier l'état du générateur en même temps.
 
+\section{Conclusion}
 
-Ce projet d'initiation a été une véritable découverte pour nous, puisque on a appris à utiliser de nouveaux langages de programmation, R et Rshiny. De plus, on a découvert la simulation de variables aléatoires multivariées qui sont utiles lorsque l'on veut simuler certains phénomènes physiques.
+Ainsi, nous avons commencé par simuler des variables aléatoires simples en se basant
+uniquement sur runif (fonction uniforme de R). Nous savons maintenant utilisé les méthodes
+ d'inversion et d'acceptation-rejet. Nous avons également poussé notre étude en simulation
+ mutlivariée et en spatial. Pour cela nous avons utilisé les méthode de de krigeage et éventuellement
+ nous allons voir si nous pouvons implémenter la méthode spectrale pour simuler des processus gaussiens
+
+\section{Ce que nous pourrions amélirorer}
+\subsection{Vitesse}
+
+Les boucles en R sont péniblement lentes comparé aux autre languages compilés comme le C. Donc, la plupart de nos algorithmes implémentés sont
+centaines des fois plus lentes que les fonctions de base en R telles que \texttt{runif}, \texttt{rexp}, etc. Si on avait plus de temps,
+on aurait aimé implémenter les fonctions en C en utilisant le package Rcpp qui permet d'écrire notre propre code en C/C++ à executer sous R.
+\section{Réflexions}
+
+\renewcommand {\epigraphflush} {flushleft}
+\epigraph{Ce projet d'initiation a été une véritable découverte pour moi, puisque j'ai appris à
+ utiliser de nouveaux langages de programmation, R et Rshiny. De plus, j'ai découvert la
+  simulation de variables aléatoires multivariées qui sont utiles
+lorsque l'on veut simuler certains phénomènes physiques.} {\textit{Samson}}
+
+\epigraph{J'ai acquis de nombreuse compétence en informatique grâce à ce projet. J'ai appris à utiliser Github en projet,
+le logiciel R et Rshiny. J'ai compris les notions d'aléatoire et pseudo-aléatoire.}
+ {\textit{Pauline}}
+
+\epigraph{J'ai approfindi mes connaissances autour la génération des variables aléatoires qui est indispensable dans le domaine
+de processus stochastique ou des nombreuses phenomènes phsyiques sont modélisé par des fonctions aléatoires. J'ai eu ma première rencontre
+avec la simulation conditionnelle et j'ai pu découvrir des nouveaux outils mathématiques utilisés en géostatistique tel que le variogram, la méthode spectrale,
+et le krigeage.}
+ {\textit{Evan}}
+
+
+\newpage
+
+\begin{thebibliography}{9}
+    \bibitem{coursgeo}
+    Yann Méneroux (2018), \emph{Introduction à la Géostatistique}, Institut National de l'Information Géographique et Forestièr
+    \bibitem{texbook}
+    Donald E. Knuth (1986) \emph{The \TeX{} Book}, Addison-Wesley Professional.
+
+    \bibitem{acc rej}
+    Karl Sigman (2007), \emph{Acceptance-Rejection Method}
+
+    \bibitem{inv transform}
+    Karl Sigman (2010), \emph{Inverse Transform Method}
+
+    \bibitem{krig}
+    Eric Marcon (2021), \emph{Krigeage avec R}
+
+    \bibitem{handbook}
+    Dikr P. Kroese (2011), Thomas Taimre, and Zdravko I. Botev, \emph{Handbook of Monte Carlo Methods}, Wiley series in Probability and Statistics
+
+    \bibitem{variate generation}
+    Luc Devroye (1986), \emph{Non-Uniform Random Variate Generation}, Springer Science
+
+    \bibitem{geo sim}
+    Christian Lantuéjoul (2002), \emph{Geostatistical Simulation}, Springer
+
+    \bibitem{mont methods}
+    Christian P. Robert, George Casella (1999), \emph{Monte Carlo Statistical Methods Second Edition}, Springer Texts in Statistics
+
+    \bibitem{geostat}
+    Jean-Paul Chilès, Pierre Delfiner (2012), \emph{Geostatistics Modeling Spatial Uncertainty}, Wiley series in Probability and Statistics
+
+    \end{thebibliography}
 
 
 
