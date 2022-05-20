@@ -6,7 +6,7 @@
 
 \input{preamble.tex}
 
-\title{Simulation conditionnelle d’un processus gaussien}
+\title{Simulation conditionnelle d'un processus gaussien}
 \author{NEEL Pauline, PETROS Russom Samson, RAKOTOVAO Jonathan, VOYLES Evan}
 \date{19 Mai 2022}
 
@@ -264,6 +264,20 @@ de la fonction de répartition d'une loi cible. Comme la fonction de répartitio
 $[0, 1]$, si on peut trouver une expression fermée de son inverse $F^{-1} : [0, 1] \longrightarrow \mathbb{R}$, on applique la méthode de transformation inversée
 afin de réaliser des simulations.
 
+\subsubsection{Démonstration}
+On pose :
+\begin{align}
+u = F(x) \Leftrightarrow x = F^{-1}(u)
+\end{align}
+
+Par définition, on a $F(x) = \mathbb{P}(X \leq  F^{-1}(u) )$.\
+Il vient alors :
+$F(F^{-1}(u)) = \mathbb{P}(X \leq F^{-1}(u) )$
+
+Or, par définition de la réciproque :
+$F(F^{-1}(u)) = u$ et comme F est strictement croissante : $\mathbb{P}(X \leq F^{-1}(u) )$.\
+On en déduit que : $u = \mathbb{P}(F(X) \leq u )$ et on reconnaît la foncion de répartition de la loi uniforme.
+
 Pour éclairer la méthode, on va étudier la fonction de répartition de la loi exponentielle. Pour rappel, une variable aléatoire suivant une loi exponentielle de paramètre
 $\lambda$ a pour fonction de densité $f(x) = \lambda e^{-\lambda x}$ pour $x \geq 0$, $0$ sinon. On a choisi cette loi parce qu'elle est munie d'une fonction de répartition facilement calculable
 et surtout dont l'inverse a une expression analytique. Calculons sa fonction de répartition:
@@ -316,6 +330,49 @@ On obtient alors le graphique suivant qui montre que les moyennes empiriques cal
 \section{Méthode d'acceptation-rejet}
 
 Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet.
+
+\subsection{Démonstration}
+Soit X une variable aléatoire de densité f et de fonction de répartition F.\
+Supposons f nulle en dehors d'un intervalle [a,b].\
+Soit M un majorant de f(x) : $\forall x \in [a,b] : f(x) \leq M$ \
+
+On considère le graphe de la fonction $y = f(x)$ :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{media/Graphe_fonction.jpg}
+
+\end{figure}
+
+On a :
+\begin{align}
+\mathbb{P}(X \leq X_0) &= \mathbb{P}(X \leq  X_0 | A = (X, Y) ) \
+&= \mathbb{P}(X \leq  X_0 | Y \leq f(x) )
+\end{align}
+ce qui donne, d'après la formule des probabilités conditionnelles :
+
+\begin{align}
+&= \frac{\mathbb{P}(X \leq  X_0, Y \leq f(x) )}{\mathbb{P}(Y \leq f(x))}
+\end{align}
+Or,
+
+\begin{align}
+\mathbb{P}(X \leq  X_0, Y \leq f(x) ) = \frac{\mathrm{surface\ de\ la\ zone\ hachurée}}{\mathrm{surface\ du\ rectangle\ (abcd)}} = \frac{F(X_0)}{M(b-a)}
+\end{align}
+et
+
+\begin{align}
+\mathbb{P}(X \leq  X_0, Y \leq f(x) ) = \frac{\mathrm{surface\ sous\ la\ courbe}}{\mathrm{surface\ du\ rectangle\ (abcd)}} = \frac{1}{M(b-a)}
+\end{align}
+On en déduit que :
+
+\begin{align}
+\mathbb{P}(X \leq X_0) = \frac{F(X_0)}{M(b-a)} x \frac{M(b-a)}{1}=F(X_0)
+\end{align}
+La variable X ainsi obtenue a bien une densité f et une fonction de
+répartition F.
+
+\subsubsection{Simulation}
 
 Prenons un exemple simple pour mieux comprendre. Notons $f$ la fonction densité de loi que l'on souhaite simuler : $f(x) = 6x(1-x) $ sur le compact [0, 1] .
 
@@ -731,7 +788,54 @@ quelques simulations de ce sort avant de détailler la méthodologie au niveau a
        \label{fig:three graphs}
 \end{figure}
 
+\subsubsection{Méthodologie}
 
+Reprenons l'exemple d'une grille de $3$ lignes et $3$ colonnes. Pour simuler une réalisation de la fonction aléatoire $Z$, on procède en simulant
+un vecteur gaussien de $9$ éléments, dont la matrice de covariance $\Sigma$ est déterminé par l'hypothèse de stationnarité forte (à l'ordre 1 et 2) et
+calculé selon un modèle choisit. Nous utiliserons le modèle exponentielle pour commencer. Finalement, pour simplifier l'exemple on prend une espérance
+$\mu = \textbf{0} \in \mathbb{R}^9$.
+
+Pour simuler un vecteur gaussien dans $\mathbb{R}^9$, on a besoin d'une matrice de covariance de $9$ lignes et $9$ colonnes :
+$$
+\Sigma =
+\begin{pmatrix}
+    \mathrm{Cov}[s_1, s_1] & \dots & \mathrm{Cov}[s_1, s_9] \\
+    \vdots & \ddots & \\
+    \mathrm{Cov}[s_9, s_1] & \dots & \mathrm{Cov}[s_9, s_9]
+\end{pmatrix}
+$$
+
+Sous l'hypothèse de stationnarité, pour $C(h)$ le modèle exponentiel et $d(s_i, s_j)$ la norme euclidienne des coordonnées
+de $s_i$ et $s_j$, on réecrit :
+
+$$
+\Sigma =
+\begin{pmatrix}
+    C(d(s_1, s_1)) & \dots & C(d(s_1, s_9)) \\
+    \vdots & \ddots & \\
+    C(d(s_9, s_1)) & \dots & C(d(s_9, s_9))
+\end{pmatrix}
+$$
+
+En calculant les distances, l'on a :
+$$
+\Sigma = C(H), \quad H =
+\begin{pmatrix}
+    0 & 1 & 2 & 1 & \sqrt{2} & \sqrt{5} & 2 & \sqrt{5} & 2\sqrt{2} \\
+     & 0 & 1 & \sqrt{2} & 1 & \sqrt{2} & \sqrt{5} & 2 & \sqrt{5} \\
+     &  & 0 & \sqrt{5} & \sqrt{2} & 1 & 2\sqrt{2} & \sqrt{5} & 2\\
+     & & & 0 & 1 & 2 & 1 & \sqrt{2} & \sqrt{5} \\
+     & & & & 0 & 1 & \sqrt{2} & 1 & \sqrt{2} \\
+     & & & & & 0 & \sqrt{5} & \sqrt{2} & 1 \\
+     & & & & & & 0 & 1 & 2 \\
+     & & & & & & & 0 & 1 \\
+     & & & & & & & & 0 \\
+\end{pmatrix}
+$$
+
+Comme la matrice $\Sigma$ est symmétrique, on rempli que le partie triangulaire à droite de $H$ pour breveté. Illustrons l'un des calculs pour qu'on comprends
+bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre une site fixe et \textbf{toutes} les autres sites.
+Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple, $$H_{1, 6} = d(s_1, s_6) = ||(1, 1) - (2, 3)||_2 = \sqrt{5}$$.
 \section{R shiny}
 
 Pour faire la simulation sans passer par du code R, nous avons créé une interface web afin de récupérer les variables simulées.
