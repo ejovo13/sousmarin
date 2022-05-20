@@ -3,7 +3,7 @@ library(sousmarin)
 library(pracma)
 library(testit)
 
-n <- 60 # 60 takes about a MINUTE maybe more.
+n <- 9 # 60 takes about a MINUTE maybe more.
         # I wonder if I should write a function that takes the CHOL
         # factorization to avoid that computational step??
         # Then we're really just left with matrix multiplication
@@ -11,8 +11,8 @@ n <- 60 # 60 takes about a MINUTE maybe more.
 
 mu <- rep(0, n * n)
 # sigma <- get_cov_matrix_gauss(n, 2.7, 1)
-# sigma <- get_cov_matrix_exp(n, 6)
-sigma <- get_cov_matrix_sphere(n, 6)
+sigma <- get_cov_matrix_exp(n, 3)
+# sigma <- get_cov_matrix_sphere(n, 6)
 # sigma <- get_cov_matrix_tent(n, 3, 5)
 L <- chol(sigma)
 
@@ -37,3 +37,5 @@ image(big_image, col = hcl.colors(5, palette = "viridis"), bty = "n", xaxt = "n"
 # dev.off()
 
 # plt.mv2()
+
+

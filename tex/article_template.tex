@@ -341,7 +341,6 @@ On considère le graphe de la fonction $y = f(x)$ :
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.6\textwidth]{media/Graphe_fonction.jpg}
-
 \end{figure}
 
 On a :
@@ -835,8 +834,97 @@ $$
 
 Comme la matrice $\Sigma$ est symmétrique, on rempli que le partie triangulaire à droite de $H$ pour breveté. Illustrons l'un des calculs pour qu'on comprends
 bien ce que l'on vient de calculer. Pour chaque ligne, on souhaiterait calculer la covariance entre une site fixe et \textbf{toutes} les autres sites.
-Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple, $$H_{1, 6} = d(s_1, s_6) = ||(1, 1) - (2, 3)||_2 = \sqrt{5}$$.
-\section{R shiny}
+Pour la première ligne, on a computé les distances entre $s_1$ et $s_i \in \{s_1, \dots, s_9\}$. Par exemple,
+\begin{align*}
+    H_{1, 1} &= d(s_1, s_1) = ||(1, 1) - (1, 1)||_2 = 0 \\
+    H_{1, 2} &= d(s_1, s_2) = ||(1, 1) - (1, 2)||_2 = 1 \\
+    H_{1, 6} &= d(s_1, s_6) = ||(1, 1) - (2, 3)||_2 = \sqrt{5}.
+\end{align*}
+
+Une dernière étape c'est d'appliquer le modèle de covariance exponentielle $C(h; a) = \exp(\frac{-|h|}{a})$ pour tout élément $h$ de $H$ afin de trouver $\Sigma$, un comportement qui est implémenté par la fonction
+\texttt{get\_cov\_matrix\_exp(n, a)} pour une grille de $n$ lignes et $n$ colonnes. Pour notre exemple, on appelle \texttt{get\_cov\_matrix\_exp(3, 1)}.
+
+$$
+\Sigma = C(H; 1) =
+\begin{pmatrix}
+    1.00 & 0.37 & 0.14 & 0.37 & 0.24 & 0.11 & 0.14 & 0.11 & 0.06 \\
+    0.37 & 1.00 & 0.37 & 0.24 & 0.37 & 0.24 & 0.11 & 0.14 & 0.11 \\
+    14 & 0.37 & 1.00 & 0.11 & 0.24 & 0.37 & 0.06 & 0.11 & 0.14 \\
+    0.37 & 0.24 & 0.11 & 1.00 & 0.37 & 0.14 & 0.37 & 0.24 & 0.11 \\
+    0.24 & 0.37 & 0.24 & 0.37 & 1.00 & 0.37 & 0.24 & 0.37 & 0.24 \\
+    0.11 & 0.24 & 0.37 & 0.14 & 0.37 & 1.00 & 0.11 & 0.24 & 0.37 \\
+    0.14 & 0.11 & 0.06 & 0.37 & 0.24 & 0.11 & 1.00 & 0.37 & 0.14 \\
+    0.11 & 0.14 & 0.11 & 0.24 & 0.37 & 0.24 & 0.37 & 1.00 & 0.37 \\
+    0.06 & 0.11 & 0.14 & 0.11 & 0.24 & 0.37 & 0.14 & 0.37 & 1.00 \\
+\end{pmatrix}
+$$
+
+On pourrait appliquer des autres modèles de covariance pour changer la dépendance spatiale de notre fonction aléatoire:
+
+\begin{itemize}
+    \item[] Modèle de tente :
+    \[
+        C(h; a, \sigma) = \left\{\begin{array}{lr}
+            \sigma^2(1 - \frac{|h|}{a}), & \text{si } 0< |n|\leq a\\
+            0 & \text{si } |h| > a
+            \end{array}\right.
+    \]
+
+    \texttt{get\_cov\_matrix\_tent(3, 2, 1)}
+    $$
+    \Sigma = C(H; 2, 1) =
+    \begin{pmatrix}
+    1 & 0.50 & 0.00 & 0.50 & 0.29 & 0.00 & 0.00 & 0.00 & 0.00 \\
+    0.50                       & 1.00 & 0.50 & 0.29 & 0.50 & 0.29 & 0.00 & 0.00 & 0.00 \\
+    0.00                       & 0.50 & 1.00 & 0.00 & 0.29 & 0.50 & 0.00 & 0.00 & 0.00 \\
+    0.50                       & 0.29 & 0.00 & 1.00 & 0.50 & 0.00 & 0.50 & 0.29 & 0.00 \\
+    0.29                       & 0.50 & 0.29 & 0.50 & 1.00 & 0.50 & 0.29 & 0.50 & 0.29 \\
+    0.00                       & 0.29 & 0.50 & 0.00 & 0.50 & 1.00 & 0.00 & 0.29 & 0.50 \\
+    0.00                       & 0.00 & 0.00 & 0.50 & 0.29 & 0.00 & 1.00 & 0.50 & 0.00 \\
+    0.00                       & 0.00 & 0.00 & 0.29 & 0.50 & 0.29 & 0.50 & 1.00 & 0.50 \\
+    0.00                       & 0.00 & 0.00 & 0.00 & 0.29 & 0.50 & 0.00 & 0.50 & 1.00
+    \end{pmatrix}
+    $$
+
+    Ainsi que le modèle sphérique
+    \[
+        C(|h|; a, m) = \left\{\begin{array}{lr}
+            m(1 - (\frac{3}{2}\frac{|h|}{a} - \frac{1}{2}\frac{|h|^3}{a^3})), & \text{si } 0< |n|\leq a\\
+            0 & \text{si } |h| > a
+            \end{array}\right.
+    \]et gaussien
+    \[
+        C(|h|; a, m) = \begin{array}{lr}
+            m \exp (- \frac{|h|^2}{a^2}), & a > 0
+            \end{array}
+    \]
+    restent à notre disposition avec nos implémentations \texttt{get\_cov\_matrix\_sphere} et
+    \texttt{get\_cov\_matrix\_gauss}.
+
+\end{itemize}
+
+Maintenant on appelle notre fonction \texttt{rmvnorm} pour simuler un vecteur gaussien dans $\mathbb{R}^9$ avec espérance $0$ et
+matrice de covariance $\Sigma = C(H; a)$ suivant un modèle exponentiel avec $a = 3$.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=5cm]{media/grid9.png}
+    \caption{Réalisation $\omega \in \Omega$ d'un champ gaussien sur $\mathcal{D} \in \mathbb{R}^2$ dans $\mathbb{R}$ avec fonction de covariance exponentielle. Les valuers $Z(s)$ sont représenté en utilisant l'échelle
+    de couleur \texttt{viridis}.}
+\end{figure}
+
+Pour élucider plus de structure, on fait augmenter la taille de notre grille. Cependant, comme la matrice de covariance est de taille $n^2$ lignes et $n^2$ colonnes pour une grille $n$ fois $n$, le nombre d'opérations juste pour
+calculer $\Sigma$ est de complexité $\mathcal{O}(n^4)$! Et finalement la décomposition de Cholesky est de compléxité $\mathcal{O}(n^3)$ ainsi que la multiplication matricielle.
+
+En résumé, cette méthode de simulation spatiale souffre de la malédiction des dimensions donc elle n'est pas traitable pour des grilles dont $n$
+dépasse $100$. C'est ici où on pourrait parler des autre méthodes telle que la méthode spectrale pour simuler plus efficacement un champ gaussien de covariance
+exponentielle.
+
+\subsection{Krigeage} La dernière partie de notre projet s'oriente autour d'une méthode dite le krigéage, qui est effectivement une union de la simulation spatiale
+avec le problème numérique des moindres carrés.
+
+\section{Programmation}
+\subsection{R shiny}
 
 Pour faire la simulation sans passer par du code R, nous avons créé une interface web afin de récupérer les variables simulées.
 cette interface est implémentée avec la bibliothèque Rshiny, cette bibliothèque est simple à utiliser et permet de créer des sitewebs
@@ -846,17 +934,44 @@ Nous n'avons pas encore terminé de coder l'application mais dans la version fin
 Aléatoires simulés.
 
 \begin{figure}[h!]
-\centering
-\includegraphics[width=\linewidth]{media/apppic1.png}
-\vspace{-5cm}
-\caption{1,000 réalisations d'une variable aléatoire normale avec espérance 0 et variance 1}
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/apppic1.png}
+        \caption{$C(|h|) = m \exp(-\frac{|h|^2}{a^2})$}
+        \label{gauss plasma}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{media/rshiny_gauss.png}
+        \caption{Sphere}
+        \label{fig:three sin x}
+    \end{subfigure}
 \end{figure}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=\linewidth]{media/rshiny_gauss.png}
-\caption{Simulaton d'une loi gaussienne bivarié avec Cov$(X, Y) = 0.6$ et Var$(X)$ = Var$(Y) = 1$.}
-\end{figure}
+% \begin{figure}[h!]
+% \centering
+% \includegraphics[width=\linewidth]{media/apppic1.png}
+% \vspace{-5cm}
+% \caption{1,000 réalisations d'une variable aléatoire normale avec espérance 0 et variance 1}
+% \end{figure}
+
+% \begin{figure}[h!]
+% \centering
+% \includegraphics[width=\linewidth]{media/rshiny_gauss.png}
+% \caption{Simulaton d'une loi gaussienne bivarié avec Cov$(X, Y) = 0.6$ et Var$(X)$ = Var$(Y) = 1$.}
+% \end{figure}
+
+
+\subsection{\texttt{sousmarin}}
+Le package \texttt{R} \texttt{sousmarin} est disponible sur notre reperpertoire github \href{https://github.com/ejovo13/sousmarin}{ejovo13/sousmarin} avec les instructions pour comment télécharger la bibliothèque
+sous \texttt{R} avec \texttt{install\_github} du package \texttt{devtools} écrit par le charmant Hadley Wickham.
+
+Le package \texttt{sousmarin} contient les implémentations de toutes les méthodes que nous avons présentées dans ce rapport. La fonction d'acceptation-rejet pour une loi normale a été implémentée en \texttt{C++} en cohésion
+avec le package \texttt{Rcpp} qui permet la compilation de code source en \texttt{C++} avec une interface en \texttt{R}. Aussi les fonctions pour générer la matrice de covariance pour une simulation
+spatiale ont été réecrites en \texttt{C++} comme les boucles sont très lentes en \texttt{R}. Avant la réécriture, la fonction \texttt{get\_cov\_mat\_exp} mettait environ une minute pour simuler une grille
+de dimension $60$ x $60$. Après l'implémentation en \texttt{C++} et nous avons réussi à effectuer une réalisation de $100$ x $100$ en moins de 10 secondes.
 
 \section{Conclusion}
 
