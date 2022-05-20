@@ -92,10 +92,11 @@ get_lambda <- function(coords_list, x, n, a = sqrt(8)) {
 }
 
 # Final function to simulate a gaussian field
+#' @export
 sim_gauss_field_exp <- function(grid_nrow, a = 2, mu = -1) {
 
     # if mu == -1, then the default value was never changed, set mv = 0
-    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    if (mu[1] == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
     else { mean_vector <- mu }
 
     Sigma <- get_cov_matrix_exp(grid_nrow, a)
@@ -104,10 +105,11 @@ sim_gauss_field_exp <- function(grid_nrow, a = 2, mu = -1) {
 }
 
 # Final function to simulate a gaussian field
+#' @export
 sim_gauss_field_gauss <- function(grid_nrow, a = 2, m = 1, mu = -1) {
 
     # if mu == -1, then the default value was never changed, set mv = 0
-    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    if (mu[1] == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
     else { mean_vector <- mu }
 
     Sigma <- get_cov_matrix_gauss(grid_nrow, a, m)
@@ -116,10 +118,11 @@ sim_gauss_field_gauss <- function(grid_nrow, a = 2, m = 1, mu = -1) {
 }
 
 # Final function to simulate a gaussian field
+#' @export
 sim_gauss_field_tent <- function(grid_nrow, a = 3, sigma = 5, mu = -1) {
 
     # if mu == -1, then the default value was never changed, set mv = 0
-    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    if (mu[1] == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
     else { mean_vector <- mu }
 
     Sigma <- get_cov_matrix_tent(grid_nrow, a, sigma)
@@ -128,10 +131,11 @@ sim_gauss_field_tent <- function(grid_nrow, a = 3, sigma = 5, mu = -1) {
 }
 
 # Final function to simulate a gaussian field
+#'@export
 sim_gauss_field_sphere <- function(grid_nrow, a = 6, m = 1, mu = -1) {
 
     # if mu == -1, then the default value was never changed, set mv = 0
-    if (mu == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
+    if (mu[1] == -1) { mean_vector <- rep(0, grid_nrow * grid_nrow) }
     else { mean_vector <- mu }
 
     Sigma <- get_cov_matrix_sphere(grid_nrow, a, m)

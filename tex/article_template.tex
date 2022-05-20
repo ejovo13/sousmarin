@@ -252,8 +252,7 @@ Comme la moyenne d'une loi uniforme est $\frac{b - a}{2} = \frac{1 - 0}{2} = 0.5
 d'une loi uniforme est $\frac{b - a}{\sqrt{12}} = \frac{1 - 0}{\sqrt{12}} = 0.2886751$, ce qui est proche de notre $s = 0.2877586$.
 
 
-\subsection{Simulation de différentes lois}
-
+\subsubsection{Simulation de différentes lois}
 
 Maintenant que nous avons compris la notion de "aléatoire" et de "pseudo-aléatoire", et que nous avons saisi comment fonctionne la fonction runif de R, nous allons pouvoir générer des variables aléatoires plus complexes. Dans la prochaine partie, nous allons implémenter la méthode de transformation inversée, pour simuler une loi exponentielle. Ensuite nous verrons la méthode d'acceptation-rejet pour simuler une loi normale, et finalement la méthode de Box-Muller. Tous ces  algorithmes sont contruits à partir de runif, fonction de R qui distribue une variable aléatoire uniforme.
 
@@ -309,29 +308,28 @@ L'implémentation en R ne prend qu'une seule ligne:
     }
 \end{lstlisting}
 
-On peut facilement comparer la moyenne empirique avec la moyenne théorique. En effet, on sait que théoriquement, l'espérance de la loi exponentielle de paramètre $\lambda$ est $$g(x)=\lambda exp(-\lambda x)$$ Ainsi, on effectue la moyenne d'un grand nombre de réalisations pour plusieurs $\lambda$,  et on compare ces résultats avec la théorie.
+On peut facilement comparer la moyenne empirique avec la moyenne théorique. En effet, on sait que théoriquement, l'espérance de la loi
+exponentielle de paramètre $\lambda$ est $\frac{1}{\lambda}$ Ainsi, on effectue la moyenne de $n = 1e4$ réalisations pour plusieurs
+$\lambda$, et on compare ces résultats avec la théorie.
 
-On obtient alors le graphique suivant qui montre que les moyennes empiriques calculées pour chaque lambda correspondent aux valeurs théoriques de l'espérance.
+On obtient alors le graphique suivant qui montre que les moyennes empiriques calculées pour chaque lambda correspondent aux valeurs théoriques
+de l'espérance.
+
+\newpage
+
 \begin{figure}[h!]
     \centering
-    \include{plots/Rplot03.tex}
-    \vspace{-1cm}
-   \caption{Histogramme généré à partir d'un appel à \texttt{r\_std\_unif} avec $n = 1000000$. On initialise la graine de notre
-    générateur avec un appel à \texttt{set\_seed(0)}.}
-
+    \includegraphics{media/moyenne_empiriques_exp.png}
+    \caption{Comparaison moyennes empiriques avec espérance de plusiers lois exponentielles de paramètre $\lambda$.
+    En rouge les moyennes empiriques. En noir les valeurs théoriques de l'espérance, $1/\lambda$.}
 \end{figure}
 
 
-%%% PREUVE
-
-
-
-
-\section{Méthode d'acceptation-rejet}
+\subsection{Méthode d'acceptation-rejet}
 
 Comment faire lorsque l'on veut simuler une loi dont on ne peut pas calculer l'inverse de la fonction de répartition ? Une solution est d'utiliser la méthode d'acceptation-rejet.
 
-\subsection{Démonstration}
+\subsubsection{Démonstration}
 Soit X une variable aléatoire de densité f et de fonction de répartition F.\
 Supposons f nulle en dehors d'un intervalle [a,b].\
 Soit M un majorant de f(x) : $\forall x \in [a,b] : f(x) \leq M$ \
@@ -379,12 +377,10 @@ Le principe est simple : on va borner f par une fonction g que l'on sait simuler
 
 Ensuite, pour chaque abscisse, on tire $Y \sim \mathcal{U}(0, 1.5)$ ce qui représentera l'ordonnée de notre point. On aura alors tiré des points uniformément répartis dans le rectangle. Finalement, on garde seulement l'abscisse de ceux se trouvant en dessous de la fonction $f(x)$. Ainsi, l'ensemble de ces valeurs, les abscisses des points acceptés donc, seront bien distribuées selon la loi $f(x)$.
 
-\newpage
 \begin{figure}[h!]
-\centering
-\includegraphics[width=\linewidth]{media/graph_acceptation_rejet.png}
-
-\caption{app shiny pour faire la simulation}
+    \centering
+    \includegraphics[width=.7\linewidth]{media/graph_acceptation_rejet.png}
+    \caption{app shiny pour faire la simulation}
 \end{figure}
 
 Sur ce graphique, on voit que les points en rouge se situant au-dessus de $f(x)$ seront rejetés tandis que les points blancs se situant en-dessous de la courbe seront acceptés.
@@ -456,8 +452,6 @@ la densité de la loi "double exponentielle" en vert qui correspond à une varia
 
 
 Grâce à la méthode d'inversion, nous savons simuler des réalisations selon la loi de $g(x)$. Ces réalisations sont bien distribuées sur $  \mathbb{R} $ entier. Pour avoir une réalisation qui suit une loi normale, on commence donc par tirer X qui suit la loi de $g(x)$. Ensuite, on tire son ordonnée Y qui suit la loi $\mathcal{U}(0, g(X))$. Puis on pose une condition, si $Y > f(X)$ alors le point est rejeté, ie on ne le prend pas en compte. En revanche, si $Y \le f(X)$ alors le point est accepté. On garde uniquement sont abscisse X, qui suit alors la loi de $f_X(x)$.
-
-\newpage
 
 \begin{figure}[h!]
 \centering
@@ -611,29 +605,31 @@ Remarque : Pour simuler $Z \sim N (\mu, \sigma^2 ),$ on simule $X \sim N (0, 1)$
 
  \
  \underline{Exemple:En deux dimension}:
-    
+
 
 
  \
  \underline{Preuve}:
 
- La matrice de covariance de tout vecteur aléatoire $ \textbf{Y} $ est donnée par $ \mathbb{E}(\textbf{YY^T})$, où $ \mathbb{Y} $ est 
- un vecteur colonne aléatoire de taille $\it{n×1}$. Prenez maintenant un vecteur aléatoire, \textbf{X}, constitué de variables aléatoires
-  non corrélées, chaque variable aléatoire, $ \textbf{X_i} $, ayant une moyenne nulle et une variance unitaire de 1. Puisque les $\textbf{X_i}$ 
-  sont des variables aléatoires non corrélées de moyenne nulle et de variance unitaire, nous avons $\mathbb{E}(\textbf{X_iX_j})= \delta_{ij} $. 
+ La matrice de covariance de tout vecteur aléatoire $ \textbf{Y} $
+ est donnée par $\mathbb{E}(\textbf{YY}^T)$, où $ \mathbb{Y} $ est
+ un vecteur colonne aléatoire de taille $n \times 1$. Prenez maintenant un vecteur aléatoire,
+ $\textbf{X}$, constitué de variables aléatoires
+  non corrélées, chaque variable aléatoire, $\textbf{X}_i$, ayant une moyenne nulle et une variance unitaire de 1. Puisque les $\textbf{X}_i$
+  sont des variables aléatoires non corrélées de moyenne nulle et de variance unitaire, nous avons $\mathbb{E}(\textbf{X}_i\textbf{X}_j)= \delta_{ij} $.
   Par conséquent,
 
-$$\mathbb{E}(\textbf{XX^T}) = \mathbb{I} $$
+$$\mathbb{E}(\textbf{XX}^T) = \text{Id} $$
 
 
-Pour générer un vecteur aléatoire avec une matrice de covariance $\Sigma$ donnée, on regarde la décomposition de Cholesky de $\Sigma$, 
-c'est-à-dire $\Sigma =\textbf{LL^T} $. Notez qu'il est possible d'obtenir une décomposition de Cholesky de $\Sigma$ puisque, par définition, 
-la matrice de covariance $\Sigma $ est symétrique et définie positive. 
+Pour générer un vecteur aléatoire avec une matrice de covariance $\Sigma$ donnée, on regarde la décomposition de Cholesky de $\Sigma$,
+c'est-à-dire $\Sigma =\textbf{LL}^T $. Notez qu'il est possible d'obtenir une décomposition de Cholesky de $\Sigma$ puisque, par définition,
+la matrice de covariance $\Sigma $ est symétrique et définie positive.
 
-Considérons maintenant le vecteur aléatoire $\textbf{Z=LX}$. Nous avons
+Considérons maintenant le vecteur aléatoire $\textbf{Z} = \textbf{LX}$. Nous avons
 
- $$ \mathbb{E}(\textbf{ZZ^T}) = \mathbb{E}(\textbf{(LX)(LX)^T}) = \mathbb{E}(\textbf{LXX^{T}L^{T}}) = 
- \textbf{L}\mathbb{E}(\textbf{XX^{T}})\textbf{L^{T}} = \textbf{LIL^{T}} = \Sigma $$
+ $$ \mathbb{E}(\textbf{ZZ}^T) = \mathbb{E}(\textbf{(LX)(LX)}^T) = \mathbb{E}(\textbf{LXX}^{T}\textbf{L}^{T}) =
+ \textbf{L}\mathbb{E}(\textbf{XX}^{T})\textbf{L}^{T} = \textbf{LIL}^{T} = \Sigma $$
 
 Par conséquent, le vecteur aléatoire Z possède la matrice de covariance souhaitée, $ \Sigma $.
 

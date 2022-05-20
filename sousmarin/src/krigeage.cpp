@@ -4,6 +4,7 @@
 
 using namespace Rcpp;
 
+//' @export
 // [[Rcpp::export]]
 NumericVector ind_to_coord(const int index, const int grid_nrow) {
 
@@ -12,6 +13,7 @@ NumericVector ind_to_coord(const int index, const int grid_nrow) {
 
 }
 
+//' @export
 // [[Rcpp::export]]
 double coord_to_dist(const NumericVector& p1, const NumericVector& p2) {
     return std::sqrt(std::pow(p1[0] - p2[0], 2) + std::pow(p1[1] - p2[1], 2));
