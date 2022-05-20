@@ -28,7 +28,7 @@ image(Z, xaxt = "n", yaxt = "n", bty = "n")
 Z[-obs_ind] = 100
 image(Z, xaxt = "n", yaxt = "n", bty = "n")
 
-Z[-obs_ind] = 0
+# Z[-obs_ind] = 0
 
 lhs <- get_cov_matrix_lambda(list_coords, a)
 
