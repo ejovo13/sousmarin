@@ -1,6 +1,6 @@
 #` @include lcg.r
 
-
+#' @export
 box_muller = function(u1, u2){
 
   z1 = sqrt(-2*log(u1))*cos(2*pi*u2)
@@ -24,6 +24,7 @@ u2=c(0.7 ,0.9 ,0.1)
 
 box_muller(u1,u2)
 
+#' @export
 box_muller_gauss = function(n){
   u1 = r_unif(n/2)
   u2 = r_unif(n/2)
@@ -31,6 +32,7 @@ box_muller_gauss = function(n){
 }
 
 
+#' @export
 box_muller_gauss_nous = function(n){
   u1 = r_unif(n/2,n, 2^16 +1 )
   u2 = r_unif(n/2,n, 2^16 +1 )
