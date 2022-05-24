@@ -26,16 +26,16 @@ box_muller(u1,u2)
 
 #' @export
 box_muller_gauss = function(n){
-  u1 = r_unif(n/2)
-  u2 = r_unif(n/2)
+  u1 = runif(n/2)
+  u2 = runif(n/2)
   box_muller(u1,u2)
 }
 
 
 #' @export
 box_muller_gauss_nous = function(n){
-  u1 = r_unif(n/2,n, 2^16 +1 )
-  u2 = r_unif(n/2,n, 2^16 +1 )
+  u1 = runif(n/2,n, 2^16 +1 )
+  u2 = runif(n/2,n, 2^16 +1 )
   box_muller(u1,u2)
 }
 
